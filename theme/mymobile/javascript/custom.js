@@ -251,19 +251,12 @@ $(document).ready(function() {
     $('div#page-course-view-topcollPAGE').live('pagebeforecreate',function(event, ui){
         $('#page-course-view-topcollPAGE ul.section').attr("data-role", "none");
         $('.section li img').removeClass("ui-li-icon");
-        $.getScript('../course/format/topcoll/lib.js');
+        $.getScript('../course/format/topcoll/module.js');
         $('#page-course-view-topcollPAGE tr.cps a').attr("data-role", "button").attr("data-icon", "arrow-r");
         $('#page-course-view-topcollPAGE #thetopics').attr("data-role", "controlgroup");
         $('#page-course-view-topcollPAGE td.cps_centre').each(function(index) {
             var cpsc = $(this).text().replace('<br>','').replace(')','');
             $(this).prev('td').find('a').append('<span class="ui-li-count ui-btn-up-a ui-btn-corner-all">' + cpsc + '</span>');
-        });
-        $('tr.cps').click(function() {
-            if ($(this).hasClass('opencps')) {
-                $(this).removeClass("opencps");
-            } else {
-                $(this).addClass("opencps");
-            }
         });
     });
 

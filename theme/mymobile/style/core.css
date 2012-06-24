@@ -1365,7 +1365,7 @@ tr.cps {
 }
 tr.cps td span.ui-li-count {
     font-size: .6em !important;
-    right: 12px;
+    right: -48px;
 }
 #page-course-view-topcollPAGE .cps .ui-btn-inner {
     white-space: normal;

@@ -38,7 +38,7 @@ if ($showswatch == "light") {
 $mypagetype = $PAGE->pagetype;
 
 echo $OUTPUT->doctype() ?>
-<html <?php echo $OUTPUT->htmlattributes() ?>>
+<html id="mymobile" <?php echo $OUTPUT->htmlattributes() ?>>
 <head>
     <title><?php echo $PAGE->title ?></title>
     <link rel="shortcut icon" href="<?php echo $OUTPUT->pix_url('favicon', 'theme')?>" />
