@@ -117,6 +117,19 @@ class user_editadvanced_form extends moodleform {
                 $mform->hardFreeze('suspended');
             }
         }
+        
+        if (empty($USER->newadminuser) and ($user and is_siteadmin($user))) {
+            // prevent change of password here if this is an existing admin
+            if ($mform->elementExists('passwordpolicyinfo')) {
+                $mform->removeElement('passwordpolicyinfo');
+            }
+            if ($mform->elementExists('newpassword')) {
+                $mform->removeElement('newpassword');
+            }            
+            if ($mform->elementExists('preference_auth_forcepasswordchange')) {
+                $mform->removeElement('preference_auth_forcepasswordchange');
+            }
+        }
 
         // print picture
         if (!empty($CFG->gdversion) and empty($USER->newadminuser)) {
