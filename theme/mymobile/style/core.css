@@ -1358,12 +1358,14 @@ a.comment-link, .block_comments a.showcommentsnonjs, .block_comments .comment-ar
     padding:0;
 }
 
-/*#page-course-view-topcollPAGE .section td.content {
+/*
+#page-course-view-topcollPAGE .section td.content {
     padding: .5em;
-}
-#page-course-view-topcollPAGE td.left.side, #page-course-view-topcollPAGE td.right.side {
+}*/
+#page-course-view-topcollPAGE .topics div.left.side, #page-course-view-topcollPAGE .topics div.right.side {
     display: none;
 }
+/*
 #page-course-view-topcollPAGE tr.cps td a {
     background: none !important;
     color: inherit !important;
