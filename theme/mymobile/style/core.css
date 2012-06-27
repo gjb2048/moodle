@@ -1346,17 +1346,19 @@ a.comment-link, .block_comments a.showcommentsnonjs, .block_comments .comment-ar
     display: block;
 }
 /*collapsed topic format*/
-#thetopics {
-    table-layout: inherit !important;
-    width: 100%;
-    display: block !important;
-}
-#page-course-view-topcollPAGE .section td.content, col.content {
+/*#page-course-view-topcollPAGE .section td.content, col.content {
     text-align: left;
     width: 100% !important;
     overflow: hidden;
+}*/
+
+#page-course-view-topcollPAGE .course-content ul.topics li.section, .course-content ul.topics li.tcsection {
+    list-style: none;
+    margin:5px 0 0 0;
+    padding:0;
 }
-#page-course-view-topcollPAGE .section td.content {
+
+/*#page-course-view-topcollPAGE .section td.content {
     padding: .5em;
 }
 #page-course-view-topcollPAGE td.left.side, #page-course-view-topcollPAGE td.right.side {
@@ -1377,14 +1379,14 @@ tr.cps td span {
 tr.cps {
     background-color: inherit !important;
     color: inherit !important;
-}
+}*/
 .opencps .ui-btn-inner .ui-icon-arrow-r {
     background-position: -216px 50%;
 }
-tr.cps td span.ui-li-count {
+/*tr.cps td span.ui-li-count {
     font-size: .6em !important;
     right: 12px;
-}
+}*/
 #page-course-view-topcollPAGE .cps .ui-btn-inner {
     white-space: normal;
 }
