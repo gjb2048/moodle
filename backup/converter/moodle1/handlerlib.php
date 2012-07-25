@@ -26,7 +26,6 @@
  * @copyright  2011 David Mudrak <david@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/backup/util/xml/xml_writer.class.php');
@@ -56,6 +55,7 @@ abstract class moodle1_handlers_factory {
             new moodle1_gradebook_handler($converter),
         );
 
+        $handlers = array_merge($handlers, self::get_plugin_handlers('format', $converter));
         $handlers = array_merge($handlers, self::get_plugin_handlers('mod', $converter));
         $handlers = array_merge($handlers, self::get_plugin_handlers('block', $converter));
 
@@ -86,7 +86,7 @@ abstract class moodle1_handlers_factory {
         $handlers = array();
         $plugins = get_plugin_list($type);
         foreach ($plugins as $name => $dir) {
-            $handlerfile  = $dir . '/backup/moodle1/lib.php';
+            $handlerfile = $dir . '/backup/moodle1/lib.php';
             $handlerclass = "moodle1_{$type}_{$name}_handler";
             if (!file_exists($handlerfile)) {
                 continue;
@@ -100,8 +100,8 @@ abstract class moodle1_handlers_factory {
         }
         return $handlers;
     }
-}
 
+}
 
 /**
  * Base backup conversion handler
@@ -137,8 +137,34 @@ abstract class moodle1_handler implements loggable {
     public function log($message, $level, $a = null, $depth = null, $display = false) {
         $this->converter->log($message, $level, $a, $depth, $display);
     }
+
 }
 
+class moodle1_file_xml_output extends file_xml_output {
+
+    protected function init() {
+        if (!file_exists(dirname($this->fullpath))) {
+            throw new xml_output_exception('directory_not_exists', dirname($this->fullpath));
+        }
+        if (!is_writable(dirname($this->fullpath))) {
+            throw new xml_output_exception('directory_not_writable', dirname($this->fullpath));
+        }
+        // Open the OS file for modifying.
+        if (!$this->fhandle = fopen($this->fullpath, 'c')) {
+            throw new xml_output_exception('error_opening_file');
+        }
+    }
+
+    public function container_xml($containerelement) {
+        $offset = 3; // For the '</' and '>' parts of the tag.
+        $offset += strlen($containerelement);
+        $offset = $offset * -1;
+        if (-1 == fseek($this->fhandle, $offset, SEEK_END)) {
+            throw new xml_output_exception('error_seeking_file');
+        }
+    }
+
+}
 
 /**
  * Base backup conversion handler that generates an XML file
@@ -150,6 +176,12 @@ abstract class moodle1_xml_handler extends moodle1_handler {
 
     /** @var null|xml_writer */
     protected $xmlwriter;
+
+    /** @var null|moodle1_file_xml_output */
+    protected $xmloutput;
+
+    /** @var null|tag */
+    protected $appending = null;
 
     /**
      * Opens the XML writer - after calling, one is free to use $xmlwriter
@@ -165,14 +197,21 @@ abstract class moodle1_xml_handler extends moodle1_handler {
 
         if (!$this->xmlwriter instanceof xml_writer) {
             $this->xmlfilename = $filename;
-            $fullpath  = $this->converter->get_workdir_path() . '/' . $this->xmlfilename;
+            $fullpath = $this->converter->get_workdir_path() . '/' . $this->xmlfilename;
             $directory = pathinfo($fullpath, PATHINFO_DIRNAME);
 
             if (!check_dir_exists($directory)) {
                 throw new moodle1_convert_exception('unable_create_target_directory', $directory);
             }
-            $this->xmlwriter = new xml_writer(new file_xml_output($fullpath), new moodle1_xml_transformer());
+            $this->xmloutput = new moodle1_file_xml_output($fullpath);
+            $this->xmlwriter = new xml_writer($this->xmloutput, new moodle1_xml_transformer());
+            if (!is_null($this->appending)) {
+                $this->xmlwriter->set_prologue('');
+            }
             $this->xmlwriter->start();
+            if (!is_null($this->appending)) {
+                $this->xmloutput->container_xml($this->appending);
+            }
         }
     }
 
@@ -185,7 +224,13 @@ abstract class moodle1_xml_handler extends moodle1_handler {
      */
     protected function close_xml_writer() {
         if ($this->xmlwriter instanceof xml_writer) {
+            if (!is_null($this->appending)) {
+                $this->xmloutput->write('</' . $this->appending . '>');
+            }
             $this->xmlwriter->stop();
+            if (!is_null($this->appending)) {
+                $this->xmlwriter->set_prologue(null);
+            }
         }
         unset($this->xmlwriter);
         $this->xmlwriter = null;
@@ -220,7 +265,7 @@ abstract class moodle1_xml_handler extends moodle1_handler {
             throw new moodle1_convert_exception('write_xml_without_writer');
         }
 
-        $mypath    = $parent . $element;
+        $mypath = $parent . $element;
         $myattribs = array();
 
         // detect properties that should be rendered as element's attributes instead of children
@@ -234,7 +279,7 @@ abstract class moodle1_xml_handler extends moodle1_handler {
         }
 
         // reorder the $data so that all sub-branches are at the end (needed by our parser)
-        $leaves   = array();
+        $leaves = array();
         $branches = array();
         foreach ($data as $name => $value) {
             if (is_array($value)) {
@@ -250,7 +295,7 @@ abstract class moodle1_xml_handler extends moodle1_handler {
         foreach ($data as $name => $value) {
             if (is_array($value)) {
                 // recursively call self
-                $this->write_xml($name, $value, $attribs, $mypath.'/');
+                $this->write_xml($name, $value, $attribs, $mypath . '/');
             } else {
                 $this->xmlwriter->full_tag($name, $value);
             }
@@ -273,7 +318,7 @@ abstract class moodle1_xml_handler extends moodle1_handler {
      */
     protected function make_sure_xml_exists($filename, $rootelement = false, $content = array()) {
 
-        $existed = file_exists($this->converter->get_workdir_path().'/'.$filename);
+        $existed = file_exists($this->converter->get_workdir_path() . '/' . $filename);
 
         if ($existed) {
             return true;
@@ -287,8 +332,12 @@ abstract class moodle1_xml_handler extends moodle1_handler {
 
         return false;
     }
-}
 
+    public function appending($containerelement) {
+        $this->appending = $containerelement;
+    }
+
+}
 
 /**
  * Process the root element of the backup file
@@ -316,7 +365,7 @@ class moodle1_root_handler extends moodle1_xml_handler {
         global $CFG;
 
         // restore the stashes prepared by other handlers for us
-        $backupinfo         = $this->converter->get_stash('backup_info');
+        $backupinfo = $this->converter->get_stash('backup_info');
         $originalcourseinfo = $this->converter->get_stash('original_course_info');
 
         ////////////////////////////////////////////////////////////////////////
@@ -361,14 +410,14 @@ class moodle1_root_handler extends moodle1_xml_handler {
         // moodle_backup/information/details
         $this->xmlwriter->begin_tag('details');
         $this->write_xml('detail', array(
-            'backup_id'     => $this->converter->get_id(),
-            'type'          => backup::TYPE_1COURSE,
-            'format'        => backup::FORMAT_MOODLE,
-            'interactive'   => backup::INTERACTIVE_YES,
-            'mode'          => backup::MODE_CONVERTED,
-            'execution'     => backup::EXECUTION_INMEDIATE,
+            'backup_id' => $this->converter->get_id(),
+            'type' => backup::TYPE_1COURSE,
+            'format' => backup::FORMAT_MOODLE,
+            'interactive' => backup::INTERACTIVE_YES,
+            'mode' => backup::MODE_CONVERTED,
+            'execution' => backup::EXECUTION_INMEDIATE,
             'executiontime' => 0,
-        ), array('/detail/backup_id'));
+                ), array('/detail/backup_id'));
         $this->xmlwriter->end_tag('details');
 
         // moodle_backup/information/contents
@@ -378,26 +427,26 @@ class moodle1_root_handler extends moodle1_xml_handler {
         $this->xmlwriter->begin_tag('activities');
         $activitysettings = array();
         foreach ($this->converter->get_stash('coursecontents') as $activity) {
-            $modinfo = $this->converter->get_stash('modinfo_'.$activity['modulename']);
+            $modinfo = $this->converter->get_stash('modinfo_' . $activity['modulename']);
             $modinstance = $modinfo['instances'][$activity['instanceid']];
             $this->write_xml('activity', array(
-                'moduleid'      => $activity['cmid'],
-                'sectionid'     => $activity['sectionid'],
-                'modulename'    => $activity['modulename'],
-                'title'         => $modinstance['name'],
-                'directory'     => 'activities/'.$activity['modulename'].'_'.$activity['cmid']
+                'moduleid' => $activity['cmid'],
+                'sectionid' => $activity['sectionid'],
+                'modulename' => $activity['modulename'],
+                'title' => $modinstance['name'],
+                'directory' => 'activities/' . $activity['modulename'] . '_' . $activity['cmid']
             ));
             $activitysettings[] = array(
-                'level'     => 'activity',
-                'activity'  => $activity['modulename'].'_'.$activity['cmid'],
-                'name'      => $activity['modulename'].'_'.$activity['cmid'].'_included',
-                'value'     => (($modinfo['included'] === 'true' and $modinstance['included'] === 'true') ? 1 : 0));
+                'level' => 'activity',
+                'activity' => $activity['modulename'] . '_' . $activity['cmid'],
+                'name' => $activity['modulename'] . '_' . $activity['cmid'] . '_included',
+                'value' => (($modinfo['included'] === 'true' and $modinstance['included'] === 'true') ? 1 : 0));
             $activitysettings[] = array(
-                'level'     => 'activity',
-                'activity'  => $activity['modulename'].'_'.$activity['cmid'],
-                'name'      => $activity['modulename'].'_'.$activity['cmid'].'_userinfo',
+                'level' => 'activity',
+                'activity' => $activity['modulename'] . '_' . $activity['cmid'],
+                'name' => $activity['modulename'] . '_' . $activity['cmid'] . '_userinfo',
                 //'value'     => (($modinfo['userinfo'] === 'true' and $modinstance['userinfo'] === 'true') ? 1 : 0));
-                'value'     => 0); // todo hardcoded non-userinfo for now
+                'value' => 0); // todo hardcoded non-userinfo for now
         }
         $this->xmlwriter->end_tag('activities');
 
@@ -407,26 +456,26 @@ class moodle1_root_handler extends moodle1_xml_handler {
         foreach ($this->converter->get_stash_itemids('sectioninfo') as $sectionid) {
             $sectioninfo = $this->converter->get_stash('sectioninfo', $sectionid);
             $sectionsettings[] = array(
-                'level'     => 'section',
-                'section'   => 'section_'.$sectionid,
-                'name'      => 'section_'.$sectionid.'_included',
-                'value'     => 1);
+                'level' => 'section',
+                'section' => 'section_' . $sectionid,
+                'name' => 'section_' . $sectionid . '_included',
+                'value' => 1);
             $sectionsettings[] = array(
-                'level'     => 'section',
-                'section'   => 'section_'.$sectionid,
-                'name'      => 'section_'.$sectionid.'_userinfo',
-                'value'     => 0); // @todo how to detect this from moodle.xml?
+                'level' => 'section',
+                'section' => 'section_' . $sectionid,
+                'name' => 'section_' . $sectionid . '_userinfo',
+                'value' => 0); // @todo how to detect this from moodle.xml?
             $this->write_xml('section', array(
                 'sectionid' => $sectionid,
-                'title'     => $sectioninfo['number'], // because the title is not available
-                'directory' => 'sections/section_'.$sectionid));
+                'title' => $sectioninfo['number'], // because the title is not available
+                'directory' => 'sections/section_' . $sectionid));
         }
         $this->xmlwriter->end_tag('sections');
 
         // moodle_backup/information/contents/course
         $this->write_xml('course', array(
-            'courseid'  => $originalcourseinfo['original_course_id'],
-            'title'     => $originalcourseinfo['original_course_shortname'],
+            'courseid' => $originalcourseinfo['original_course_id'],
+            'title' => $originalcourseinfo['original_course_shortname'],
             'directory' => 'course'));
         unset($originalcourseinfo);
 
@@ -437,23 +486,23 @@ class moodle1_root_handler extends moodle1_xml_handler {
 
         // fake backup root seetings
         $rootsettings = array(
-            'filename'         => $backupinfo['name'],
-            'users'            => 0, // @todo how to detect this from moodle.xml?
-            'anonymize'        => 0,
+            'filename' => $backupinfo['name'],
+            'users' => 0, // @todo how to detect this from moodle.xml?
+            'anonymize' => 0,
             'role_assignments' => 0,
-            'activities'       => 1,
-            'blocks'           => 1,
-            'filters'          => 0,
-            'comments'         => 0,
-            'userscompletion'  => 0,
-            'logs'             => 0,
-            'grade_histories'  => 0,
+            'activities' => 1,
+            'blocks' => 1,
+            'filters' => 0,
+            'comments' => 0,
+            'userscompletion' => 0,
+            'logs' => 0,
+            'grade_histories' => 0,
         );
         unset($backupinfo);
         foreach ($rootsettings as $name => $value) {
             $this->write_xml('setting', array(
                 'level' => 'root',
-                'name'  => $name,
+                'name' => $name,
                 'value' => $value));
         }
         unset($rootsettings);
@@ -541,13 +590,11 @@ class moodle1_root_handler extends moodle1_xml_handler {
         $this->make_sure_xml_exists('groups.xml', 'groups');
         $this->make_sure_xml_exists('outcomes.xml', 'outcomes_definition');
         $this->make_sure_xml_exists('users.xml', 'users');
-        $this->make_sure_xml_exists('course/roles.xml', 'roles',
-            array('role_assignments' => array(), 'role_overrides' => array()));
-        $this->make_sure_xml_exists('course/enrolments.xml', 'enrolments',
-            array('enrols' => array()));
+        $this->make_sure_xml_exists('course/roles.xml', 'roles', array('role_assignments' => array(), 'role_overrides' => array()));
+        $this->make_sure_xml_exists('course/enrolments.xml', 'enrolments', array('enrols' => array()));
     }
-}
 
+}
 
 /**
  * The class responsible for course and site files migration
@@ -568,17 +615,17 @@ class moodle1_files_handler extends moodle1_xml_handler {
      * Migrates course_files in the converter workdir
      */
     protected function migrate_course_files() {
-        $ids  = array();
+        $ids = array();
         $fileman = $this->converter->get_file_manager($this->converter->get_contextid(CONTEXT_COURSE), 'course', 'legacy');
         $this->converter->set_stash('course_files_ids', array());
-        if (file_exists($this->converter->get_tempdir_path().'/course_files')) {
+        if (file_exists($this->converter->get_tempdir_path() . '/course_files')) {
             $ids = $fileman->migrate_directory('course_files');
             $this->converter->set_stash('course_files_ids', $ids);
         }
         $this->log('course files migrated', backup::LOG_INFO, count($ids));
     }
-}
 
+}
 
 /**
  * Handles the conversion of /MOODLE_BACKUP/INFO paths
@@ -633,8 +680,8 @@ class moodle1_info_handler extends moodle1_handler {
 
         // keep only such modules that seem to have the support for moodle1 implemented
         $modname = $this->currentmod['name'];
-        if (file_exists($CFG->dirroot.'/mod/'.$modname.'/backup/moodle1/lib.php')) {
-            $this->converter->set_stash('modinfo_'.$modname, $this->currentmod);
+        if (file_exists($CFG->dirroot . '/mod/' . $modname . '/backup/moodle1/lib.php')) {
+            $this->converter->set_stash('modinfo_' . $modname, $this->currentmod);
             $this->modnames[] = $modname;
         } else {
             $this->log('unsupported activity module', backup::LOG_WARNING, $modname);
@@ -649,8 +696,8 @@ class moodle1_info_handler extends moodle1_handler {
     public function on_info_details_end() {
         $this->converter->set_stash('modnameslist', $this->modnames);
     }
-}
 
+}
 
 /**
  * Handles the conversion of /MOODLE_BACKUP/COURSE/HEADER paths
@@ -669,50 +716,50 @@ class moodle1_course_header_handler extends moodle1_xml_handler {
     public function get_paths() {
         return array(
             new convert_path(
-                'course_header', '/MOODLE_BACKUP/COURSE/HEADER',
-                array(
-                    'newfields' => array(
-                        'summaryformat'          => 1,
-                        'legacyfiles'            => 2,
-                        'requested'              => 0, // @todo not really new, but maybe never backed up?
-                        'restrictmodules'        => 0,
-                        'enablecompletion'       => 0,
-                        'completionstartonenrol' => 0,
-                        'completionnotify'       => 0,
-                        'tags'                   => array(),
-                        'allowed_modules'        => array(),
-                    ),
-                    'dropfields' => array(
-                        'roles_overrides',
-                        'roles_assignments',
-                        'cost',
-                        'currancy',
-                        'defaultrole',
-                        'enrol',
-                        'enrolenddate',
-                        'enrollable',
-                        'enrolperiod',
-                        'enrolstartdate',
-                        'expirynotify',
-                        'expirythreshold',
-                        'guest',
-                        'notifystudents',
-                        'password',
-                        'student',
-                        'students',
-                        'teacher',
-                        'teachers',
-                        'metacourse',
+                    'course_header', '/MOODLE_BACKUP/COURSE/HEADER',
+                    array(
+                        'newfields' => array(
+                            'summaryformat' => 1,
+                            'legacyfiles' => 2,
+                            'requested' => 0, // @todo not really new, but maybe never backed up?
+                            'restrictmodules' => 0,
+                            'enablecompletion' => 0,
+                            'completionstartonenrol' => 0,
+                            'completionnotify' => 0,
+                            'tags' => array(),
+                            'allowed_modules' => array(),
+                        ),
+                        'dropfields' => array(
+                            'roles_overrides',
+                            'roles_assignments',
+                            'cost',
+                            'currancy',
+                            'defaultrole',
+                            'enrol',
+                            'enrolenddate',
+                            'enrollable',
+                            'enrolperiod',
+                            'enrolstartdate',
+                            'expirynotify',
+                            'expirythreshold',
+                            'guest',
+                            'notifystudents',
+                            'password',
+                            'student',
+                            'students',
+                            'teacher',
+                            'teachers',
+                            'metacourse',
+                        )
                     )
-                )
             ),
             new convert_path(
-                'course_header_category', '/MOODLE_BACKUP/COURSE/HEADER/CATEGORY',
-                array(
-                    'newfields' => array(
-                        'description' => null,
+                    'course_header_category', '/MOODLE_BACKUP/COURSE/HEADER/CATEGORY',
+                    array(
+                        'newfields' => array(
+                            'description' => null,
+                        )
                     )
-                )
             ),
         );
     }
@@ -723,8 +770,8 @@ class moodle1_course_header_handler extends moodle1_xml_handler {
      * the result. Once the parser is fixed, it can be refactored.
      */
     public function process_course_header($data, $raw) {
-       $this->course    = array_merge($this->course, $data);
-       $this->courseraw = array_merge($this->courseraw, $raw);
+        $this->course = array_merge($this->course, $data);
+        $this->courseraw = array_merge($this->courseraw, $raw);
     }
 
     public function process_course_header_category($data) {
@@ -737,8 +784,8 @@ class moodle1_course_header_handler extends moodle1_xml_handler {
 
         // stash the information needed by other handlers
         $info = array(
-            'original_course_id'        => $this->course['id'],
-            'original_course_fullname'  => $this->course['fullname'],
+            'original_course_id' => $this->course['id'],
+            'original_course_fullname' => $this->course['fullname'],
             'original_course_shortname' => $this->course['shortname'],
             'original_course_startdate' => $this->course['startdate'],
             'original_course_contextid' => $contextid
@@ -758,8 +805,8 @@ class moodle1_course_header_handler extends moodle1_xml_handler {
         $this->write_xml('course', $this->course, array('/course/id', '/course/contextid'));
         $this->close_xml_writer();
     }
-}
 
+}
 
 /**
  * Handles the conversion of course sections and course modules
@@ -779,43 +826,43 @@ class moodle1_course_outline_handler extends moodle1_xml_handler {
         return array(
             new convert_path('course_sections', '/MOODLE_BACKUP/COURSE/SECTIONS'),
             new convert_path(
-                'course_section', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION',
-                array(
-                    'newfields' => array(
-                        'name'          => null,
-                        'summaryformat' => 1,
-                        'sequence'      => null,
-                    ),
-                )
+                    'course_section', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION',
+                    array(
+                        'newfields' => array(
+                            'name' => null,
+                            'summaryformat' => 1,
+                            'sequence' => null,
+                        ),
+                    )
             ),
             new convert_path(
-                'course_module', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION/MODS/MOD',
-                array(
-                    'newfields' => array(
-                        'completion'                => 0,
-                        'completiongradeitemnumber' => null,
-                        'completionview'            => 0,
-                        'completionexpected'        => 0,
-                        'availablefrom'             => 0,
-                        'availableuntil'            => 0,
-                        'showavailability'          => 0,
-                        'availability_info'         => array(),
-                        'visibleold'                => 1,
-                        'showdescription'           => 0,
-                    ),
-                    'dropfields' => array(
-                        'instance',
-                        'roles_overrides',
-                        'roles_assignments',
-                    ),
-                    'renamefields' => array(
-                        'type' => 'modulename',
-                    ),
-                )
+                    'course_module', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION/MODS/MOD',
+                    array(
+                        'newfields' => array(
+                            'completion' => 0,
+                            'completiongradeitemnumber' => null,
+                            'completionview' => 0,
+                            'completionexpected' => 0,
+                            'availablefrom' => 0,
+                            'availableuntil' => 0,
+                            'showavailability' => 0,
+                            'availability_info' => array(),
+                            'visibleold' => 1,
+                            'showdescription' => 0,
+                        ),
+                        'dropfields' => array(
+                            'instance',
+                            'roles_overrides',
+                            'roles_assignments',
+                        ),
+                        'renamefields' => array(
+                            'type' => 'modulename',
+                        ),
+                    )
             ),
             new convert_path('course_modules', '/MOODLE_BACKUP/COURSE/MODULES'),
-            // todo new convert_path('course_module_roles_overrides', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION/MODS/MOD/ROLES_OVERRIDES'),
-            // todo new convert_path('course_module_roles_assignments', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION/MODS/MOD/ROLES_ASSIGNMENTS'),
+                // todo new convert_path('course_module_roles_overrides', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION/MODS/MOD/ROLES_OVERRIDES'),
+                // todo new convert_path('course_module_roles_assignments', '/MOODLE_BACKUP/COURSE/SECTIONS/SECTION/MODS/MOD/ROLES_ASSIGNMENTS'),
         );
     }
 
@@ -831,18 +878,18 @@ class moodle1_course_outline_handler extends moodle1_xml_handler {
         global $CFG;
 
         // check that this type of module should be included in the mbz
-        $modinfo = $this->converter->get_stash_itemids('modinfo_'.$data['modulename']);
+        $modinfo = $this->converter->get_stash_itemids('modinfo_' . $data['modulename']);
         if (empty($modinfo)) {
             return;
         }
 
         // add the course module into the course contents list
         $this->coursecontents[$data['id']] = array(
-            'cmid'       => $data['id'],
+            'cmid' => $data['id'],
             'instanceid' => $raw['INSTANCE'],
-            'sectionid'  => $this->currentsection['id'],
+            'sectionid' => $this->currentsection['id'],
             'modulename' => $data['modulename'],
-            'title'      => null
+            'title' => null
         );
 
         // add the course module id into the section's sequence
@@ -853,15 +900,15 @@ class moodle1_course_outline_handler extends moodle1_xml_handler {
         }
 
         // add the sectionid and sectionnumber
-        $data['sectionid']      = $this->currentsection['id'];
-        $data['sectionnumber']  = $this->currentsection['number'];
+        $data['sectionid'] = $this->currentsection['id'];
+        $data['sectionnumber'] = $this->currentsection['number'];
 
         // generate the module version - this is a bit tricky as this information
         // is not present in 1.9 backups. we will use the currently installed version
         // whenever we can but that might not be accurate for some modules.
         // also there might be problem with modules that are not present at the target
         // host...
-        $versionfile = $CFG->dirroot.'/mod/'.$data['modulename'].'/version.php';
+        $versionfile = $CFG->dirroot . '/mod/' . $data['modulename'] . '/version.php';
         if (file_exists($versionfile)) {
             include($versionfile);
             $data['version'] = $module->version;
@@ -873,7 +920,7 @@ class moodle1_course_outline_handler extends moodle1_xml_handler {
         // itemid set to the instance id. this is needed so that module handlers
         // can later obtain information about the course module and dump it into
         // the module.xml file
-        $this->converter->set_stash('cminfo_'.$data['modulename'], $data, $raw['INSTANCE']);
+        $this->converter->set_stash('cminfo_' . $data['modulename'], $data, $raw['INSTANCE']);
     }
 
     /**
@@ -921,20 +968,20 @@ class moodle1_course_outline_handler extends moodle1_xml_handler {
     public function on_course_modules_end() {
 
         foreach ($this->converter->get_stash('modnameslist') as $modname) {
-            $modinfo = $this->converter->get_stash('modinfo_'.$modname);
+            $modinfo = $this->converter->get_stash('modinfo_' . $modname);
             foreach ($modinfo['instances'] as $modinstanceid => $modinstance) {
-                $cminfo    = $this->converter->get_stash('cminfo_'.$modname, $modinstanceid);
-                $directory = 'activities/'.$modname.'_'.$cminfo['id'];
+                $cminfo = $this->converter->get_stash('cminfo_' . $modname, $modinstanceid);
+                $directory = 'activities/' . $modname . '_' . $cminfo['id'];
 
                 // write module.xml
-                $this->open_xml_writer($directory.'/module.xml');
+                $this->open_xml_writer($directory . '/module.xml');
                 $this->write_xml('module', $cminfo, array('/module/id', '/module/version'));
                 $this->close_xml_writer();
 
                 // write grades.xml
-                $this->open_xml_writer($directory.'/grades.xml');
+                $this->open_xml_writer($directory . '/grades.xml');
                 $this->xmlwriter->begin_tag('activity_gradebook');
-                $gradeitems = $this->converter->get_stash_or_default('gradebook_modgradeitem_'.$modname, $modinstanceid, array());
+                $gradeitems = $this->converter->get_stash_or_default('gradebook_modgradeitem_' . $modname, $modinstanceid, array());
                 if (!empty($gradeitems)) {
                     $this->xmlwriter->begin_tag('grade_items');
                     foreach ($gradeitems as $gradeitem) {
@@ -947,12 +994,12 @@ class moodle1_course_outline_handler extends moodle1_xml_handler {
                 $this->close_xml_writer();
 
                 // todo: write proper roles.xml, for now we just make sure the file is present
-                $this->make_sure_xml_exists($directory.'/roles.xml', 'roles');
+                $this->make_sure_xml_exists($directory . '/roles.xml', 'roles');
             }
         }
     }
-}
 
+}
 
 /**
  * Handles the conversion of the defined roles
@@ -966,14 +1013,14 @@ class moodle1_roles_definition_handler extends moodle1_xml_handler {
         return array(
             new convert_path('roles', '/MOODLE_BACKUP/ROLES'),
             new convert_path(
-                'roles_role', '/MOODLE_BACKUP/ROLES/ROLE',
-                array(
-                    'newfields' => array(
-                        'description'   => '',
-                        'sortorder'     => 0,
-                        'archetype'     => ''
+                    'roles_role', '/MOODLE_BACKUP/ROLES/ROLE',
+                    array(
+                        'newfields' => array(
+                            'description' => '',
+                            'sortorder' => 0,
+                            'archetype' => ''
+                        )
                     )
-                )
             )
         );
     }
@@ -1003,15 +1050,14 @@ class moodle1_roles_definition_handler extends moodle1_xml_handler {
             // was never executed
             $this->open_xml_writer('roles.xml');
             $this->write_xml('roles_definition', array());
-
         } else {
             // some roles were dumped into the file, let us close their wrapper now
             $this->xmlwriter->end_tag('roles_definition');
         }
         $this->close_xml_writer();
     }
-}
 
+}
 
 /**
  * Handles the conversion of the question bank included in the moodle.xml file
@@ -1044,12 +1090,12 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
         $paths = array(
             new convert_path('question_categories', '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES'),
             new convert_path(
-                'question_category', '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES/QUESTION_CATEGORY',
-                array(
-                    'newfields' => array(
-                        'infoformat' => 0
-                    )
-                )),
+                    'question_category', '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES/QUESTION_CATEGORY',
+                    array(
+                        'newfields' => array(
+                            'infoformat' => 0
+                        )
+            )),
             new convert_path('question_category_context', '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES/QUESTION_CATEGORY/CONTEXT'),
             new convert_path('questions', '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES/QUESTION_CATEGORY/QUESTIONS'),
             // the question element must be grouped so we can re-dispatch it to the qtype handler as a whole
@@ -1064,8 +1110,8 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
             }
         }
         foreach (array_keys($subpaths) as $subpath) {
-            $name = 'subquestion_'.strtolower(str_replace('/', '_', $subpath));
-            $path = '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES/QUESTION_CATEGORY/QUESTIONS/QUESTION/'.$subpath;
+            $name = 'subquestion_' . strtolower(str_replace('/', '_', $subpath));
+            $path = '/MOODLE_BACKUP/COURSE/QUESTION_CATEGORIES/QUESTION_CATEGORY/QUESTIONS/QUESTION/' . $subpath;
             $paths[] = new convert_path($name, $path);
         }
 
@@ -1087,9 +1133,9 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
      * Initializes the current category cache
      */
     public function on_question_category_start() {
-        $this->currentcategory         = array();
-        $this->currentcategoryraw      = array();
-        $this->currentcategorywritten  = false;
+        $this->currentcategory = array();
+        $this->currentcategoryraw = array();
+        $this->currentcategorywritten = false;
         $this->questionswrapperwritten = false;
     }
 
@@ -1100,7 +1146,7 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
      * called twice for both halves of the data. We merge them here into the currentcategory array.
      */
     public function process_question_category($data, $raw) {
-        $this->currentcategory    = array_merge($this->currentcategory, $data);
+        $this->currentcategory = array_merge($this->currentcategory, $data);
         $this->currentcategoryraw = array_merge($this->currentcategoryraw, $raw);
     }
 
@@ -1110,31 +1156,31 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
     public function process_question_category_context($data) {
 
         switch ($data['level']) {
-        case 'module':
-            $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_MODULE, $data['instance']);
-            $this->currentcategory['contextlevel'] = CONTEXT_MODULE;
-            $this->currentcategory['contextinstanceid'] = $data['instance'];
-            break;
-        case 'course':
-            $originalcourseinfo = $this->converter->get_stash('original_course_info');
-            $originalcourseid   = $originalcourseinfo['original_course_id'];
-            $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_COURSE);
-            $this->currentcategory['contextlevel'] = CONTEXT_COURSE;
-            $this->currentcategory['contextinstanceid'] = $originalcourseid;
-            break;
-        case 'coursecategory':
-            // this is a bit hacky. the source moodle.xml defines COURSECATEGORYLEVEL as a distance
-            // of the course category (1 = parent category, 2 = grand-parent category etc). We pretend
-            // that this level*10 is the id of that category and create an artifical contextid for it
-            $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_COURSECAT, $data['coursecategorylevel'] * 10);
-            $this->currentcategory['contextlevel'] = CONTEXT_COURSECAT;
-            $this->currentcategory['contextinstanceid'] = $data['coursecategorylevel'] * 10;
-            break;
-        case 'system':
-            $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_SYSTEM);
-            $this->currentcategory['contextlevel'] = CONTEXT_SYSTEM;
-            $this->currentcategory['contextinstanceid'] = 0;
-            break;
+            case 'module':
+                $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_MODULE, $data['instance']);
+                $this->currentcategory['contextlevel'] = CONTEXT_MODULE;
+                $this->currentcategory['contextinstanceid'] = $data['instance'];
+                break;
+            case 'course':
+                $originalcourseinfo = $this->converter->get_stash('original_course_info');
+                $originalcourseid = $originalcourseinfo['original_course_id'];
+                $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_COURSE);
+                $this->currentcategory['contextlevel'] = CONTEXT_COURSE;
+                $this->currentcategory['contextinstanceid'] = $originalcourseid;
+                break;
+            case 'coursecategory':
+                // this is a bit hacky. the source moodle.xml defines COURSECATEGORYLEVEL as a distance
+                // of the course category (1 = parent category, 2 = grand-parent category etc). We pretend
+                // that this level*10 is the id of that category and create an artifical contextid for it
+                $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_COURSECAT, $data['coursecategorylevel'] * 10);
+                $this->currentcategory['contextlevel'] = CONTEXT_COURSECAT;
+                $this->currentcategory['contextinstanceid'] = $data['coursecategorylevel'] * 10;
+                break;
+            case 'system':
+                $this->currentcategory['contextid'] = $this->converter->get_contextid(CONTEXT_SYSTEM);
+                $this->currentcategory['contextlevel'] = CONTEXT_SYSTEM;
+                $this->currentcategory['contextinstanceid'] = 0;
+                break;
         }
     }
 
@@ -1193,7 +1239,6 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
             if ($textlib->substr($textlib->strtolower($data['image']), 0, 7) == 'http://') {
                 // it is a link, appending to existing question text
                 $data['questiontext'] .= ' <img src="' . $data['image'] . '" />';
-
             } else {
                 // it is a file in course_files
                 $filename = basename($data['image']);
@@ -1202,22 +1247,21 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
                     $filepath = '/';
                 } else {
                     // append /
-                    $filepath = '/'.trim($filepath, './@#$ ').'/';
+                    $filepath = '/' . trim($filepath, './@#$ ') . '/';
                 }
 
-                if (file_exists($this->converter->get_tempdir_path().'/course_files'.$filepath.$filename)) {
+                if (file_exists($this->converter->get_tempdir_path() . '/course_files' . $filepath . $filename)) {
                     $this->fileman->contextid = $this->currentcategory['contextid'];
                     $this->fileman->component = 'question';
-                    $this->fileman->filearea  = 'questiontext';
-                    $this->fileman->itemid    = $data['id'];
-                    $this->fileman->migrate_file('course_files'.$filepath.$filename, '/', $filename);
+                    $this->fileman->filearea = 'questiontext';
+                    $this->fileman->itemid = $data['id'];
+                    $this->fileman->migrate_file('course_files' . $filepath . $filename, '/', $filename);
                     // note this is slightly different from the upgrade code as we put the file into the
                     // root folder here. this makes our life easier as we do not need to create all the
                     // directories within the specified filearea/itemid
                     $data['questiontext'] .= ' <img src="@@PLUGINFILE@@/' . $filename . '" />';
-
                 } else {
-                    $this->log('question file not found', backup::LOG_WARNING, array($data['id'], $filepath.$filename));
+                    $this->log('question file not found', backup::LOG_WARNING, array($data['id'], $filepath . $filename));
                 }
             }
         }
@@ -1229,10 +1273,10 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
         // write the common question data
         $this->xmlwriter->begin_tag('question', array('id' => $data['id']));
         foreach (array(
-            'parent', 'name', 'questiontext', 'questiontextformat',
-            'generalfeedback', 'generalfeedbackformat', 'defaultmark',
-            'penalty', 'qtype', 'length', 'stamp', 'version', 'hidden',
-            'timecreated', 'timemodified', 'createdby', 'modifiedby'
+    'parent', 'name', 'questiontext', 'questiontextformat',
+    'generalfeedback', 'generalfeedbackformat', 'defaultmark',
+    'penalty', 'qtype', 'length', 'stamp', 'version', 'hidden',
+    'timecreated', 'timemodified', 'createdby', 'modifiedby'
         ) as $fieldname) {
             if (!array_key_exists($fieldname, $data)) {
                 throw new moodle1_convert_exception('missing_common_question_field', $fieldname);
@@ -1245,12 +1289,11 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
             $handler = $this->get_qtype_handler($qtype);
             if ($handler === false) {
                 $this->log('question type converter not found', backup::LOG_ERROR, $qtype);
-
             } else {
-                $this->xmlwriter->begin_tag('plugin_qtype_'.$qtype.'_question');
+                $this->xmlwriter->begin_tag('plugin_qtype_' . $qtype . '_question');
                 $handler->use_xml_writer($this->xmlwriter);
                 $handler->process_question($data, $raw);
-                $this->xmlwriter->end_tag('plugin_qtype_'.$qtype.'_question');
+                $this->xmlwriter->end_tag('plugin_qtype_' . $qtype . '_question');
             }
         }
 
@@ -1304,9 +1347,9 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
             // initialize the list of qtype handler instances
             $this->qtypehandlers = array();
             foreach (get_plugin_list('qtype') as $qtypename => $qtypelocation) {
-                $filename = $qtypelocation.'/backup/moodle1/lib.php';
+                $filename = $qtypelocation . '/backup/moodle1/lib.php';
                 if (file_exists($filename)) {
-                    $classname = 'moodle1_qtype_'.$qtypename.'_handler';
+                    $classname = 'moodle1_qtype_' . $qtypename . '_handler';
                     require_once($filename);
                     if (!class_exists($classname)) {
                         throw new moodle1_convert_exception('missing_handler_class', $classname);
@@ -1319,16 +1362,14 @@ class moodle1_question_bank_handler extends moodle1_xml_handler {
 
         if ($qtype === '*') {
             return $this->qtypehandlers;
-
         } else if (isset($this->qtypehandlers[$qtype])) {
             return $this->qtypehandlers[$qtype];
-
         } else {
             return false;
         }
     }
-}
 
+}
 
 /**
  * Handles the conversion of the scales included in the moodle.xml file
@@ -1345,15 +1386,15 @@ class moodle1_scales_handler extends moodle1_handler {
         return array(
             new convert_path('scales', '/MOODLE_BACKUP/COURSE/SCALES'),
             new convert_path(
-                'scale', '/MOODLE_BACKUP/COURSE/SCALES/SCALE',
-                array(
-                    'renamefields' => array(
-                        'scaletext' => 'scale',
-                    ),
-                    'addfields' => array(
-                        'descriptionformat' => 0,
+                    'scale', '/MOODLE_BACKUP/COURSE/SCALES/SCALE',
+                    array(
+                        'renamefields' => array(
+                            'scaletext' => 'scale',
+                        ),
+                        'addfields' => array(
+                            'descriptionformat' => 0,
+                        )
                     )
-                )
             ),
         );
     }
@@ -1362,7 +1403,7 @@ class moodle1_scales_handler extends moodle1_handler {
      * Prepare the file manager for the files embedded in the scale description field
      */
     public function on_scales_start() {
-        $syscontextid  = $this->converter->get_contextid(CONTEXT_SYSTEM);
+        $syscontextid = $this->converter->get_contextid(CONTEXT_SYSTEM);
         $this->fileman = $this->converter->get_file_manager($syscontextid, 'grade', 'scale');
     }
 
@@ -1389,8 +1430,8 @@ class moodle1_scales_handler extends moodle1_handler {
         // stash the scale
         $this->converter->set_stash('scales', $data, $data['id']);
     }
-}
 
+}
 
 /**
  * Handles the conversion of the outcomes
@@ -1407,12 +1448,12 @@ class moodle1_outcomes_handler extends moodle1_xml_handler {
         return array(
             new convert_path('gradebook_grade_outcomes', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_OUTCOMES'),
             new convert_path(
-                'gradebook_grade_outcome', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_OUTCOMES/GRADE_OUTCOME',
-                array(
-                    'addfields' => array(
-                        'descriptionformat' => FORMAT_MOODLE,
-                    ),
-                )
+                    'gradebook_grade_outcome', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_OUTCOMES/GRADE_OUTCOME',
+                    array(
+                        'addfields' => array(
+                            'descriptionformat' => FORMAT_MOODLE,
+                        ),
+                    )
             ),
         );
     }
@@ -1422,7 +1463,7 @@ class moodle1_outcomes_handler extends moodle1_xml_handler {
      */
     public function on_gradebook_grade_outcomes_start() {
 
-        $syscontextid  = $this->converter->get_contextid(CONTEXT_SYSTEM);
+        $syscontextid = $this->converter->get_contextid(CONTEXT_SYSTEM);
         $this->fileman = $this->converter->get_file_manager($syscontextid, 'grade', 'outcome');
 
         $this->open_xml_writer('outcomes.xml');
@@ -1437,7 +1478,7 @@ class moodle1_outcomes_handler extends moodle1_xml_handler {
 
         // replay the upgrade step 2009110400
         if ($CFG->texteditors !== 'textarea') {
-            $data['description']       = text_to_html($data['description'], false, false, true);
+            $data['description'] = text_to_html($data['description'], false, false, true);
             $data['descriptionformat'] = FORMAT_HTML;
         }
 
@@ -1458,8 +1499,8 @@ class moodle1_outcomes_handler extends moodle1_xml_handler {
         $this->xmlwriter->end_tag('outcomes_definition');
         $this->close_xml_writer();
     }
-}
 
+}
 
 /**
  * Handles the conversion of the gradebook structures in the moodle.xml file
@@ -1477,12 +1518,12 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
             new convert_path('gradebook', '/MOODLE_BACKUP/COURSE/GRADEBOOK'),
             new convert_path('gradebook_grade_letter', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_LETTERS/GRADE_LETTER'),
             new convert_path(
-                'gradebook_grade_category', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_CATEGORIES/GRADE_CATEGORY',
-                array(
-                    'addfields' => array(
-                        'hidden' => 0,  // upgrade step 2010011200
-                    ),
-                )
+                    'gradebook_grade_category', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_CATEGORIES/GRADE_CATEGORY',
+                    array(
+                        'addfields' => array(
+                            'hidden' => 0, // upgrade step 2010011200
+                        ),
+                    )
             ),
             new convert_path('gradebook_grade_item', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_ITEMS/GRADE_ITEM'),
             new convert_path('gradebook_grade_item_grades', '/MOODLE_BACKUP/COURSE/GRADEBOOK/GRADE_ITEMS/GRADE_ITEM/GRADE_GRADES'),
@@ -1528,10 +1569,8 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
 
         if ($data['itemtype'] === 'mod') {
             return $this->process_mod_grade_item($data, $raw);
-
         } else if (in_array($data['itemtype'], array('manual', 'course', 'category'))) {
             return $this->process_nonmod_grade_item($data, $raw);
-
         } else {
             $this->log('unsupported grade_item type', backup::LOG_ERROR, $data['itemtype']);
         }
@@ -1542,9 +1581,9 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
      */
     protected function process_mod_grade_item(array $data, array $raw) {
 
-        $stashname   = 'gradebook_modgradeitem_'.$data['itemmodule'];
+        $stashname = 'gradebook_modgradeitem_' . $data['itemmodule'];
         $stashitemid = $data['iteminstance'];
-        $gradeitems  = $this->converter->get_stash_or_default($stashname, $stashitemid, array());
+        $gradeitems = $this->converter->get_stash_or_default($stashname, $stashitemid, array());
 
         // typically there will be single item with itemnumber 0
         $gradeitems[$data['itemnumber']] = $data;
@@ -1559,7 +1598,7 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
      */
     protected function process_nonmod_grade_item(array $data, array $raw) {
 
-        $stashname   = 'gradebook_nonmodgradeitem';
+        $stashname = 'gradebook_nonmodgradeitem';
         $stashitemid = $data['id'];
         $this->converter->set_stash($stashname, $data, $stashitemid);
 
@@ -1570,6 +1609,7 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
      * @todo
      */
     public function on_gradebook_grade_item_grades_start() {
+        
     }
 
     /**
@@ -1596,7 +1636,7 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
             $gradecategory = $this->converter->get_stash('gradebook_gradecategory', $gradecategoryid);
             $path = $this->calculate_category_path($gradecategoryid);
             $gradecategory['depth'] = count($path);
-            $gradecategory['path']  = '/'.implode('/', $path).'/';
+            $gradecategory['path'] = '/' . implode('/', $path) . '/';
             $this->write_xml('grade_category', $gradecategory, array('/grade_category/id'));
         }
         $this->xmlwriter->end_tag('grade_categories');
@@ -1655,8 +1695,8 @@ class moodle1_gradebook_handler extends moodle1_xml_handler {
         }
         $this->xmlwriter->end_tag('grade_letters');
     }
-}
 
+}
 
 /**
  * Shared base class for activity modules, blocks and qtype handlers
@@ -1687,10 +1727,10 @@ abstract class moodle1_plugin_handler extends moodle1_xml_handler {
      * @return string
      */
     public function get_component_name() {
-        return $this->plugintype.'_'.$this->pluginname;
+        return $this->plugintype . '_' . $this->pluginname;
     }
-}
 
+}
 
 /**
  * Base class for all question type handlers
@@ -1717,6 +1757,7 @@ abstract class moodle1_qtype_handler extends moodle1_plugin_handler {
      * @param array $raw grouped raw QUESTION data
      */
     public function process_question(array $data, array $raw) {
+        
     }
 
     /**
@@ -1785,13 +1826,13 @@ abstract class moodle1_qtype_handler extends moodle1_plugin_handler {
 
         // replay the upgrade step 2009100100 - new table
         $options = array(
-            'id'                 => $this->converter->get_nextid(),
-            'instructions'       => null,
+            'id' => $this->converter->get_nextid(),
+            'instructions' => null,
             'instructionsformat' => 0,
-            'showunits'          => 0,
-            'unitsleft'          => 0,
-            'unitgradingtype'    => 0,
-            'unitpenalty'        => 0.1
+            'showunits' => 0,
+            'unitsleft' => 0,
+            'unitgradingtype' => 0,
+            'unitpenalty' => 0.1
         );
 
         // replay the upgrade step 2009100101
@@ -1885,14 +1926,13 @@ abstract class moodle1_qtype_handler extends moodle1_plugin_handler {
     private function convert_answer(array $old, $qtype) {
         global $CFG;
 
-        $new                    = array();
-        $new['id']              = $old['id'];
-        $new['answertext']      = $old['answer_text'];
-        $new['answerformat']    = 0;   // upgrade step 2010080900
-        $new['fraction']        = $old['fraction'];
-        $new['feedback']        = $old['feedback'];
-        $new['feedbackformat']  = 0;   // upgrade step 2010080900
-
+        $new = array();
+        $new['id'] = $old['id'];
+        $new['answertext'] = $old['answer_text'];
+        $new['answerformat'] = 0;   // upgrade step 2010080900
+        $new['fraction'] = $old['fraction'];
+        $new['feedback'] = $old['feedback'];
+        $new['feedbackformat'] = 0;   // upgrade step 2010080900
         // replay upgrade step 2010080901
         if ($qtype !== 'multichoice') {
             $new['answerformat'] = FORMAT_PLAIN;
@@ -1905,15 +1945,14 @@ abstract class moodle1_qtype_handler extends moodle1_plugin_handler {
                 $new['feedback'] = text_to_html($new['feedback'], false, false, true);
             }
             $new['feedbackformat'] = FORMAT_HTML;
-
         } else {
             $new['feedbackformat'] = FORMAT_MOODLE;
         }
 
         return $new;
     }
-}
 
+}
 
 /**
  * Base class for activity module handlers
@@ -1944,10 +1983,10 @@ abstract class moodle1_mod_handler extends moodle1_plugin_handler {
         if (is_null($modname)) {
             $modname = $this->pluginname;
         }
-        return $this->converter->get_stash('cminfo_'.$modname, $instance);
+        return $this->converter->get_stash('cminfo_' . $modname, $instance);
     }
-}
 
+}
 
 /**
  * Base class for all modules that are successors of the 1.9 resource module
@@ -1973,6 +2012,7 @@ abstract class moodle1_resource_successor_handler extends moodle1_mod_handler {
      * @param array $raw raw legacy resource data
      */
     public function process_legacy_resource(array $data, array $raw) {
+        
     }
 
     /**
@@ -1981,16 +2021,17 @@ abstract class moodle1_resource_successor_handler extends moodle1_mod_handler {
      * @param array $data the data returned by {@link self::process_resource} or just pre-cooked
      */
     public function on_legacy_resource_end(array $data) {
+        
     }
+
 }
 
 /**
  * Base class for block handlers
  */
 abstract class moodle1_block_handler extends moodle1_plugin_handler {
-
+    
 }
-
 
 /**
  * Base class for the activity modules' subplugins
@@ -2021,4 +2062,5 @@ abstract class moodle1_submod_handler extends moodle1_plugin_handler {
     final public function get_paths() {
         return array();
     }
+
 }
