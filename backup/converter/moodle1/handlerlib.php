@@ -55,7 +55,7 @@ abstract class moodle1_handlers_factory {
             new moodle1_gradebook_handler($converter),
         );
 
-        $handlers = array_merge($handlers, self::get_plugin_handlers('format', $converter));
+        $handlers = array_merge($handlers, self::get_plugin_handlers('format', $converter));  // MDL-32205 - Currently only works for course level data in the course format, not sections or modules.
         $handlers = array_merge($handlers, self::get_plugin_handlers('mod', $converter));
         $handlers = array_merge($handlers, self::get_plugin_handlers('block', $converter));
 
@@ -140,32 +140,6 @@ abstract class moodle1_handler implements loggable {
 
 }
 
-class moodle1_file_xml_output extends file_xml_output {
-
-    protected function init() {
-        if (!file_exists(dirname($this->fullpath))) {
-            throw new xml_output_exception('directory_not_exists', dirname($this->fullpath));
-        }
-        if (!is_writable(dirname($this->fullpath))) {
-            throw new xml_output_exception('directory_not_writable', dirname($this->fullpath));
-        }
-        // Open the OS file for modifying.
-        if (!$this->fhandle = fopen($this->fullpath, 'c')) {
-            throw new xml_output_exception('error_opening_file');
-        }
-    }
-
-    public function container_xml($containerelement) {
-        $offset = 3; // For the '</' and '>' parts of the tag.
-        $offset += strlen($containerelement);
-        $offset = $offset * -1;
-        if (-1 == fseek($this->fhandle, $offset, SEEK_END)) {
-            throw new xml_output_exception('error_seeking_file');
-        }
-    }
-
-}
-
 /**
  * Base backup conversion handler that generates an XML file
  */
@@ -176,12 +150,6 @@ abstract class moodle1_xml_handler extends moodle1_handler {
 
     /** @var null|xml_writer */
     protected $xmlwriter;
-
-    /** @var null|moodle1_file_xml_output */
-    protected $xmloutput;
-
-    /** @var null|tag */
-    protected $appending = null;
 
     /**
      * Opens the XML writer - after calling, one is free to use $xmlwriter
@@ -203,15 +171,8 @@ abstract class moodle1_xml_handler extends moodle1_handler {
             if (!check_dir_exists($directory)) {
                 throw new moodle1_convert_exception('unable_create_target_directory', $directory);
             }
-            $this->xmloutput = new moodle1_file_xml_output($fullpath);
-            $this->xmlwriter = new xml_writer($this->xmloutput, new moodle1_xml_transformer());
-            if (!is_null($this->appending)) {
-                $this->xmlwriter->set_prologue('');
-            }
+            $this->xmlwriter = new xml_writer(new file_xml_output($fullpath), new moodle1_xml_transformer());
             $this->xmlwriter->start();
-            if (!is_null($this->appending)) {
-                $this->xmloutput->container_xml($this->appending);
-            }
         }
     }
 
@@ -224,13 +185,7 @@ abstract class moodle1_xml_handler extends moodle1_handler {
      */
     protected function close_xml_writer() {
         if ($this->xmlwriter instanceof xml_writer) {
-            if (!is_null($this->appending)) {
-                $this->xmloutput->write('</' . $this->appending . '>');
-            }
             $this->xmlwriter->stop();
-            if (!is_null($this->appending)) {
-                $this->xmlwriter->set_prologue(null);
-            }
         }
         unset($this->xmlwriter);
         $this->xmlwriter = null;
@@ -331,10 +286,6 @@ abstract class moodle1_xml_handler extends moodle1_handler {
         }
 
         return false;
-    }
-
-    public function appending($containerelement) {
-        $this->appending = $containerelement;
     }
 
 }
@@ -527,6 +478,22 @@ class moodle1_root_handler extends moodle1_xml_handler {
         $this->close_xml_writer();
 
         ////////////////////////////////////////////////////////////////////////
+        // write course/course.xml
+        ////////////////////////////////////////////////////////////////////////
+        $this->open_xml_writer('course/course.xml');
+        $course = $this->converter->get_stash('course_header');
+        try {
+            // Add in any format data.
+            // MDL-32205 - Currently only works for course level data in the course format, not sections or modules.
+            $formatdata = $this->converter->get_stash('course_formatdata');
+            $course = array_merge($course,$formatdata);
+        } catch (moodle1_convert_empty_storage_exception $e) {
+            // Nothing to do as no additional format data.
+        }
+        $this->write_xml('course', $course, array('/course/id', '/course/contextid'));
+        $this->close_xml_writer('course/course.xml');
+
+        ////////////////////////////////////////////////////////////////////////
         // write files.xml
         ////////////////////////////////////////////////////////////////////////
         $this->open_xml_writer('files.xml');
@@ -586,6 +553,7 @@ class moodle1_root_handler extends moodle1_xml_handler {
         // QUESTION_CATEGORIES is optional in moodle.xml but questions.xml must exist in
         // moodle2 format) or the handler has not been implemented yet.
         // apparently this must be called after the handler had a chance to create the file.
+        $this->make_sure_xml_exists('course/course.xml', 'course');
         $this->make_sure_xml_exists('questions.xml', 'question_categories');
         $this->make_sure_xml_exists('groups.xml', 'groups');
         $this->make_sure_xml_exists('outcomes.xml', 'outcomes_definition');
@@ -800,10 +768,8 @@ class moodle1_course_header_handler extends moodle1_xml_handler {
         $this->course['summary'] = moodle1_converter::migrate_referenced_files($this->course['summary'], $fileman);
         $this->converter->set_stash('course_summary_files_ids', $fileman->get_fileids());
 
-        // write course.xml
-        $this->open_xml_writer('course/course.xml');
-        $this->write_xml('course', $this->course, array('/course/id', '/course/contextid'));
-        $this->close_xml_writer();
+        // stash course_header
+        $this->converter->set_stash('course_header', $this->course);
     }
 
 }
