@@ -155,7 +155,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
         $hasnamenotsecpg = (!$onsectionpage && ($section->section != 0 || !is_null($section->name)));
 
         // When on a section page, we only display the general section title, if title is not the default one
-        $hasnamesecpg = ($onsectionpage && ($section->section == 0 && !is_null($section->name)));
+        $hasnamesecpg = ($onsectionpage && ($section->section == 0 && (string)$section->name !== ''));
 
         if ($hasnamenotsecpg || $hasnamesecpg) {
             $o.= $this->output->heading($this->section_title($section, $course), 3, 'sectionname');
