@@ -523,6 +523,51 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
     }
 
     /**
+     * Generate the html for the 'Jump to' menu on a single section page.
+     *
+     * @param stdClass $course The course entry from DB
+     * @param array $sections The course_sections entries from the DB
+     *
+     * @return string HTML to output.
+     */
+    protected function section_nav_selection($course, $sections) {
+        $o = '';
+        $section = 1;
+        $sectionmenu = array();
+        $context = context_course::instance($course->id);
+        while ($section <= $course->numsections) {
+            if (!empty($sections[$section])) {
+                $thissection = $sections[$section];
+            } else {
+                // This will create a course section if it doesn't exist..
+                $thissection = get_course_section($section, $course->id);
+
+                // The returned section is only a bare database object rather than
+                // a section_info object - we will need at least the uservisible
+                // field in it.
+                $thissection->uservisible = true;
+                $thissection->availableinfo = null;
+                $thissection->showavailability = 0;
+            }
+            $showsection = (has_capability('moodle/course:viewhiddensections', $context) or $thissection->visible or !$course->hiddensections);
+
+            if ($showsection) {
+                $sectionmenu[$section] = get_section_name($course, $thissection);
+            }
+            $section++;
+        }
+
+        if (!empty($sectionmenu)) {
+            $select = new single_select(new moodle_url('/course/view.php', array('id'=>$course->id)), 'section', $sectionmenu);
+            $select->label = get_string('jumpto');
+            $select->class = 'jumpmenu';
+            $select->formid = 'sectionmenu';
+            $o .= $this->output->render($select);
+        }
+        return $o;
+    }
+
+    /**
      * Output the html for a single section page .
      *
      * @param stdClass $course The course entry from DB
@@ -615,6 +660,15 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
         $sectionbottomnav .= html_writer::tag('div', $courselink, array('class' => 'mdl-align'));
         $sectionbottomnav .= html_writer::end_tag('div');
         echo $sectionbottomnav;
+
+        // Display section bottom jumpto.
+        $sectionbottomjt = '';
+        $sectionbottomjt .= html_writer::start_tag('div', array('class' => 'section-navigation mdl-bottom'));
+        $sectionbottomjt .= html_writer::tag('span', '&nbsp;', array('class' => 'mdl-left'));
+        $sectionbottomjt .= html_writer::tag('span', '&nbsp;', array('class' => 'mdl-right'));
+        $sectionbottomjt .= html_writer::tag('div', $this->section_nav_selection($course, $sections), array('class' => 'mdl-align'));
+        $sectionbottomjt .= html_writer::end_tag('div');
+        echo $sectionbottomjt;
 
         // close single-section div.
         echo html_writer::end_tag('div');
