@@ -537,7 +537,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
         $o = '';
         $section = 1;
         $sectionmenu = array();
-        $sectionmenu[0] = get_string('returntomaincoursepage');  // Section 0 is never jumped to and is therefore used to indicate the main page.
+        $sectionmenu[0] = get_string('maincoursepage');  // Section 0 is never jumped to and is therefore used to indicate the main page.
         $context = context_course::instance($course->id);
         while ($section <= $course->numsections) {
             if (!empty($sections[$section])) {
@@ -562,7 +562,6 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
         }
 
         $select = new single_select(new moodle_url('/course/view.php', array('id'=>$course->id)), 'section', $sectionmenu);
-        $select->label = get_string('jumpto');
         $select->class = 'jumpmenu';
         $select->formid = 'sectionmenu';
         $o .= $this->output->render($select);
