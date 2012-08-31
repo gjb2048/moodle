@@ -1,0 +1,6 @@
+[submodule "course/format/topcoll"]
+	path = course/format/topcoll
+	url = git@github.com:gjb2048/moodle-format_topcoll.git
+[submodule "course/format/grid"]
+	path = course/format/grid
+	url = git@github.com:gjb2048/moodle-courseformat_grid.git
