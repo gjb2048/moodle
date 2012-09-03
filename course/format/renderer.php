@@ -556,13 +556,13 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
             }
             $showsection = (has_capability('moodle/course:viewhiddensections', $context) or $thissection->visible or !$course->hiddensections);
 
-            if (($showsection) && ($section != $displaysection)) {
+            if ($showsection) {
                 $sectionmenu[$section] = get_section_name($course, $thissection);
             }
             $section++;
         }
 
-        $select = new single_select(new moodle_url('/course/view.php', array('id'=>$course->id)), 'section', $sectionmenu);
+        $select = new single_select(new moodle_url('/course/view.php', array('id'=>$course->id)), 'section', $sectionmenu, $displaysection, array());
         $select->class = 'jumpmenu';
         $select->formid = 'sectionmenu';
         $o .= $this->output->render($select);
