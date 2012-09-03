@@ -530,10 +530,11 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
      *
      * @param stdClass $course The course entry from DB
      * @param array $sections The course_sections entries from the DB
+     * @param $displaysection the current displayed section number.
      *
      * @return string HTML to output.
      */
-    protected function section_nav_selection($course, $sections) {
+    protected function section_nav_selection($course, $sections, $displaysection) {
         $o = '';
         $section = 1;
         $sectionmenu = array();
@@ -555,7 +556,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
             }
             $showsection = (has_capability('moodle/course:viewhiddensections', $context) or $thissection->visible or !$course->hiddensections);
 
-            if ($showsection) {
+            if (($showsection) && ($section != $displaysection)) {
                 $sectionmenu[$section] = get_section_name($course, $thissection);
             }
             $section++;
@@ -658,7 +659,7 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
         $sectionbottomnav .= html_writer::start_tag('div', array('class' => 'section-navigation mdl-bottom'));
         $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
         $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
-        $sectionbottomnav .= html_writer::tag('div', $this->section_nav_selection($course, $sections), array('class' => 'mdl-align'));
+        $sectionbottomnav .= html_writer::tag('div', $this->section_nav_selection($course, $sections, $displaysection), array('class' => 'mdl-align'));
         $sectionbottomnav .= html_writer::end_tag('div');
         echo $sectionbottomnav;
 
