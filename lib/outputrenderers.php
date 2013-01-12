@@ -398,7 +398,7 @@ class core_renderer extends renderer_base {
                 $link= '<a title="' . $title . '" href="' . $url . '">' . $txt . '</a>';
                 $output .= '<div class="profilingfooter">' . $link . '</div>';
             }
-            $output .= '<div class="purgecaches"><a href="'.$CFG->wwwroot.'/admin/purgecaches.php?confirm=1&amp;sesskey='.sesskey().'">'.get_string('purgecaches', 'admin').'</a></div>';
+            $output .= '<div class="purgecaches"><a href="'.$CFG->wwwroot.'/'.$CFG->admin.'/purgecaches.php?confirm=1&amp;sesskey='.sesskey().'">'.get_string('purgecaches', 'admin').'</a></div>';
         }
         if (!empty($CFG->debugvalidators)) {
             $output .= '<div class="validators"><ul>
@@ -1234,7 +1234,7 @@ class core_renderer extends renderer_base {
         }
 
         if ($select->label) {
-            $output .= html_writer::label($select->label, $select->attributes['id']);
+            $output .= html_writer::label($select->label, $select->attributes['id'], false, $select->labelattributes);
         }
 
         if ($select->helpicon instanceof help_icon) {
@@ -1242,7 +1242,6 @@ class core_renderer extends renderer_base {
         } else if ($select->helpicon instanceof old_help_icon) {
             $output .= $this->render($select->helpicon);
         }
-
         $output .= html_writer::select($select->options, $select->name, $select->selected, $select->nothing, $select->attributes);
 
         $go = html_writer::empty_tag('input', array('type'=>'submit', 'value'=>get_string('go')));
@@ -1310,7 +1309,7 @@ class core_renderer extends renderer_base {
         $output = '';
 
         if ($select->label) {
-            $output .= html_writer::label($select->label, $select->attributes['id']);
+            $output .= html_writer::label($select->label, $select->attributes['id'], false, $select->labelattributes);
         }
 
         if ($select->helpicon instanceof help_icon) {
@@ -1521,6 +1520,7 @@ class core_renderer extends renderer_base {
 
             $scalearray = array(RATING_UNSET_RATING => $strrate.'...') + $rating->settings->scale->scaleitems;
             $scaleattrs = array('class'=>'postratingmenu ratinginput','id'=>'menurating'.$rating->itemid);
+            $ratinghtml .= html_writer::label($rating->rating, 'menurating'.$rating->itemid, false, array('class' => 'accesshide'));
             $ratinghtml .= html_writer::select($scalearray, 'rating', $rating->rating, false, $scaleattrs);
 
             //output submit button
@@ -1530,7 +1530,13 @@ class core_renderer extends renderer_base {
             $ratinghtml .= html_writer::empty_tag('input', $attributes);
 
             if (!$rating->settings->scale->isnumeric) {
-                $ratinghtml .= $this->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale);
+                // If a global scale, try to find current course ID from the context
+                if (empty($rating->settings->scale->courseid) and $coursecontext = $rating->context->get_course_context(false)) {
+                    $courseid = $coursecontext->instanceid;
+                } else {
+                    $courseid = $rating->settings->scale->courseid;
+                }
+                $ratinghtml .= $this->help_icon_scale($courseid, $rating->settings->scale);
             }
             $ratinghtml .= html_writer::end_tag('span');
             $ratinghtml .= html_writer::end_tag('div');
@@ -1617,12 +1623,13 @@ class core_renderer extends renderer_base {
         // note: this title is displayed only if JS is disabled, otherwise the link will have the new ajax tooltip
         $title = get_string('helpprefix2', '', trim($helpicon->title, ". \t"));
 
-        $attributes = array('href'=>$url, 'title'=>$title);
+        $attributes = array('href'=>$url, 'title'=>$title, 'aria-haspopup' => 'true');
         $id = html_writer::random_id('helpicon');
         $attributes['id'] = $id;
         $output = html_writer::tag('a', $output, $attributes);
 
         $this->page->requires->js_init_call('M.util.help_icon.add', array(array('id'=>$id, 'url'=>$url->out(false))));
+        $this->page->requires->string_for_js('close', 'form');
 
         // and finally span
         return html_writer::tag('span', $output, array('class' => 'helplink'));
@@ -1681,12 +1688,13 @@ class core_renderer extends renderer_base {
         // note: this title is displayed only if JS is disabled, otherwise the link will have the new ajax tooltip
         $title = get_string('helpprefix2', '', trim($title, ". \t"));
 
-        $attributes = array('href'=>$url, 'title'=>$title);
+        $attributes = array('href'=>$url, 'title'=>$title, 'aria-haspopup' => 'true');
         $id = html_writer::random_id('helpicon');
         $attributes['id'] = $id;
         $output = html_writer::tag('a', $output, $attributes);
 
         $this->page->requires->js_init_call('M.util.help_icon.add', array(array('id'=>$id, 'url'=>$url->out(false))));
+        $this->page->requires->string_for_js('close', 'form');
 
         // and finally span
         return html_writer::tag('span', $output, array('class' => 'helplink'));

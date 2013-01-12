@@ -1485,6 +1485,7 @@ function calendar_print_month_selector($name, $selected) {
     for ($i=1; $i<=12; $i++) {
         $months[$i] = userdate(gmmktime(12, 0, 0, $i, 15, 2000), '%B');
     }
+    echo html_writer::label(get_string('months'), 'menu'. $name, false, array('class' => 'accesshide'));
     echo html_writer::select($months, $name, $selected, false);
 }
 
@@ -1930,24 +1931,22 @@ class calendar_event {
             if ($usingeditor) {
                 switch ($this->properties->eventtype) {
                     case 'user':
-                        $this->editorcontext = $this->properties->context;
                         $this->properties->courseid = 0;
+                        $this->properties->course = 0;
                         $this->properties->groupid = 0;
                         $this->properties->userid = $USER->id;
                         break;
                     case 'site':
-                        $this->editorcontext = $this->properties->context;
                         $this->properties->courseid = SITEID;
+                        $this->properties->course = SITEID;
                         $this->properties->groupid = 0;
                         $this->properties->userid = $USER->id;
                         break;
                     case 'course':
-                        $this->editorcontext = $this->properties->context;
                         $this->properties->groupid = 0;
                         $this->properties->userid = $USER->id;
                         break;
                     case 'group':
-                        $this->editorcontext = $this->properties->context;
                         $this->properties->userid = $USER->id;
                         break;
                     default:
@@ -1955,6 +1954,13 @@ class calendar_event {
                         // fail gracefully
                         $usingeditor = false;
                         break;
+                }
+
+                // If we are actually using the editor, we recalculate the context because some default values
+                // were set when calculate_context() was called from the constructor.
+                if ($usingeditor) {
+                    $this->properties->context = $this->calculate_context($this->properties);
+                    $this->editorcontext = $this->properties->context;
                 }
 
                 $editor = $this->properties->description;
@@ -1975,7 +1981,6 @@ class calendar_event {
                                                 $this->editoroptions,
                                                 $editor['text'],
                                                 $this->editoroptions['forcehttps']);
-
                 $DB->set_field('event', 'description', $this->properties->description, array('id'=>$this->properties->id));
             }
 

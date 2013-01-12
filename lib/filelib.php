@@ -1892,7 +1892,7 @@ function send_file($path, $filename, $lifetime = 'default' , $filter=0, $pathiss
             $options = new stdClass();
             $options->newlines = false;
             $options->noclean = true;
-            $text = htmlentities($pathisstring ? $path : implode('', file($path)));
+            $text = htmlentities($pathisstring ? $path : implode('', file($path)), ENT_QUOTES, 'UTF-8');
             $output = '<pre>'. format_text($text, FORMAT_MOODLE, $options, $COURSE->id) .'</pre>';
 
             header('Content-Length: '.strlen($output));
@@ -2704,14 +2704,36 @@ class curl {
      * Calls {@link multi()} with specific download headers
      *
      * <code>
-     * $c = new curl;
+     * $c = new curl();
+     * $file1 = fopen('a', 'wb');
+     * $file2 = fopen('b', 'wb');
      * $c->download(array(
-     *              array('url'=>'http://localhost/', 'file'=>fopen('a', 'wb')),
-     *              array('url'=>'http://localhost/20/', 'file'=>fopen('b', 'wb'))
+     *     array('url'=>'http://localhost/', 'file'=>$file1),
+     *     array('url'=>'http://localhost/20/', 'file'=>$file2)
+     * ));
+     * fclose($file1);
+     * fclose($file2);
+     * </code>
+     *
+     * or
+     *
+     * <code>
+     * $c = new curl();
+     * $c->download(array(
+     *              array('url'=>'http://localhost/', 'filepath'=>'/tmp/file1.tmp'),
+     *              array('url'=>'http://localhost/20/', 'filepath'=>'/tmp/file2.tmp')
      *              ));
      * </code>
      *
-     * @param array $requests An array of files to request
+     * @param array $requests An array of files to request {
+     *                  url => url to download the file [required]
+     *                  file => file handler, or
+     *                  filepath => file path
+     * }
+     * If 'file' and 'filepath' parameters are both specified in one request, the
+     * open file handle in the 'file' parameter will take precedence and 'filepath'
+     * will be ignored.
+     *
      * @param array $options An array of options to set
      * @return array An array of results
      */
@@ -2734,11 +2756,15 @@ class curl {
         $results = array();
         $main    = curl_multi_init();
         for ($i = 0; $i < $count; $i++) {
-            $url = $requests[$i];
-            foreach($url as $n=>$v){
-                $options[$n] = $url[$n];
+            if (!empty($requests[$i]['filepath']) and empty($requests[$i]['file'])) {
+                // open file
+                $requests[$i]['file'] = fopen($requests[$i]['filepath'], 'w');
+                $requests[$i]['auto-handle'] = true;
             }
-            $handles[$i] = curl_init($url['url']);
+            foreach($requests[$i] as $n=>$v){
+                $options[$n] = $v;
+            }
+            $handles[$i] = curl_init($requests[$i]['url']);
             $this->apply_opt($handles[$i], $options);
             curl_multi_add_handle($main, $handles[$i]);
         }
@@ -2755,6 +2781,13 @@ class curl {
             curl_multi_remove_handle($main, $handles[$i]);
         }
         curl_multi_close($main);
+
+        for ($i = 0; $i < $count; $i++) {
+            if (!empty($requests[$i]['filepath']) and !empty($requests[$i]['auto-handle'])) {
+                // close file handler if file is opened in this function
+                fclose($requests[$i]['file']);
+            }
+        }
         return $results;
     }
     /**
@@ -3230,15 +3263,15 @@ function file_pluginfile($relativepath, $forcedownload) {
             }
         }
 
-        if ('publishstate' === 'public') {
+        if ($entry->publishstate === 'public') {
             if ($CFG->forcelogin) {
                 require_login();
             }
 
-        } else if ('publishstate' === 'site') {
+        } else if ($entry->publishstate === 'site') {
             require_login();
             //ok
-        } else if ('publishstate' === 'draft') {
+        } else if ($entry->publishstate === 'draft') {
             require_login();
             if ($USER->id != $entry->userid) {
                 send_file_not_found();
@@ -3329,7 +3362,6 @@ function file_pluginfile($relativepath, $forcedownload) {
             if (!$event = $DB->get_record('event', array('id'=>(int)$eventid, 'eventtype'=>'site'))) {
                 send_file_not_found();
             }
-            // Check that we got an event and that it's userid is that of the user
 
             // Get the file and serve if successful
             $filename = array_pop($args);
@@ -3377,8 +3409,8 @@ function file_pluginfile($relativepath, $forcedownload) {
                 require_login($course);
             }
 
-            // Must be able to at least view the course
-            if (!is_enrolled($context) and !is_viewing($context)) {
+            // Must be able to at least view the course. This does not apply to the front page.
+            if ($course->id != SITEID && (!is_enrolled($context)) && (!is_viewing($context))) {
                 //TODO: hmm, do we really want to block guests here?
                 send_file_not_found();
             }
@@ -3399,10 +3431,10 @@ function file_pluginfile($relativepath, $forcedownload) {
                 if (!has_capability('moodle/site:accessallgroups', $context) && !groups_is_member($event->groupid, $USER->id)) {
                     send_file_not_found();
                 }
-            } else if ($event->eventtype === 'course') {
-                //ok
+            } else if ($event->eventtype === 'course' || $event->eventtype === 'site') {
+                // Ok. Please note that the event type 'site' still uses a course context.
             } else {
-                // some other type
+                // Some other type.
                 send_file_not_found();
             }
 

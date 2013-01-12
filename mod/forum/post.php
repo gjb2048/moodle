@@ -526,8 +526,10 @@ if ($USER->id != $post->userid) {   // Not the original author, so add a message
     }
 }
 
+$formheading = '';
 if (!empty($parent)) {
     $heading = get_string("yourreply", "forum");
+    $formheading = get_string('reply', 'forum');
 } else {
     if ($forum->type == 'qanda') {
         $heading = get_string('yournewquestion', 'forum');
@@ -625,6 +627,9 @@ if ($fromform = $mform_post->get_data()) {
 
         // If the user has access to all groups and they are changing the group, then update the post.
         if ($contextcheck) {
+            if (empty($fromform->groupinfo)) {
+                $fromform->groupinfo = -1;
+            }
             $DB->set_field('forum_discussions' ,'groupid' , $fromform->groupinfo, array('firstpost' => $fromform->id));
         }
 
@@ -872,6 +877,9 @@ if (!empty($parent)) {
     }
 }
 
+if (!empty($formheading)) {
+    echo $OUTPUT->heading($formheading, 2, array('class' => 'accesshide'));
+}
 $mform_post->display();
 
 echo $OUTPUT->footer();

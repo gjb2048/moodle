@@ -70,12 +70,48 @@ if (!empty($CFG->debug) and $CFG->debug >= DEBUG_ALL){
  * @global moodle_page $PAGE
  */
 function form_init_date_js() {
-    global $PAGE;
+    global $CFG, $PAGE;
     static $done = false;
     if (!$done) {
         $module   = 'moodle-form-dateselector';
         $function = 'M.form.dateselector.init_date_selectors';
-        $config = array(array('firstdayofweek'=>get_string('firstdayofweek', 'langconfig')));
+        $config = array(array(
+            'firstdayofweek'    => get_string('firstdayofweek', 'langconfig'),
+            'mon'               => strftime('%a', strtotime("Monday")),
+            'tue'               => strftime('%a', strtotime("Tuesday")),
+            'wed'               => strftime('%a', strtotime("Wednesday")),
+            'thu'               => strftime('%a', strtotime("Thursday")),
+            'fri'               => strftime('%a', strtotime("Friday")),
+            'sat'               => strftime('%a', strtotime("Saturday")),
+            'sun'               => strftime('%a', strtotime("Sunday")),
+            'january'           => strftime('%B', strtotime("January 1")),
+            'february'          => strftime('%B', strtotime("February 1")),
+            'march'             => strftime('%B', strtotime("March 1")),
+            'april'             => strftime('%B', strtotime("April 1")),
+            'may'               => strftime('%B', strtotime("May 1")),
+            'june'              => strftime('%B', strtotime("June 1")),
+            'july'              => strftime('%B', strtotime("July 1")),
+            'august'            => strftime('%B', strtotime("August 1")),
+            'september'         => strftime('%B', strtotime("September 1")),
+            'october'           => strftime('%B', strtotime("October 1")),
+            'november'          => strftime('%B', strtotime("November 1")),
+            'december'          => strftime('%B', strtotime("December 1"))
+        ));
+
+        // If we are running under Windows convert from windows encoding to UTF-8 (because it's impossible
+        // to specify UTF-8 to fetch locale info in Win32. Snippet copied from userdate().
+        if ($CFG->ostype == 'WINDOWS') {
+            if ($localewincharset = get_string('localewincharset', 'langconfig')) {
+                $textlib = textlib_get_instance();
+                foreach ($config[0] as $key => &$value) {
+                    if ($key == 'firstdayofweek') {
+                        continue;
+                    }
+                    $value = $textlib->convert($value, $localewincharset, 'utf-8');
+                }
+            }
+        }
+
         $PAGE->requires->yui_module($module, $function, $config);
         $done = true;
     }
@@ -933,6 +969,9 @@ abstract class moodleform {
             $value = $elementclone->_text;
             $elementclone->setValue(str_replace('{no}', ($i+1), $value));
 
+        } else if (is_a($elementclone, 'HTML_QuickForm_submit') || is_a($elementclone, 'HTML_QuickForm_button')) {
+            $elementclone->setValue(str_replace('{no}', ($i+1), $elementclone->getValue()));
+
         } else {
             $value=$elementclone->getLabel();
             $elementclone->setLabel(str_replace('{no}', ($i+1), $value));
@@ -1625,10 +1664,14 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
         $unfiltered = array();
         if (null === $elementList) {
             // iterate over all elements, calling their exportValue() methods
-            $emptyarray = array();
             foreach (array_keys($this->_elements) as $key) {
-                if ($this->_elements[$key]->isFrozen() && !$this->_elements[$key]->_persistantFreeze){
-                    $value = $this->_elements[$key]->exportValue($emptyarray, true);
+                if ($this->_elements[$key]->isFrozen() && !$this->_elements[$key]->_persistantFreeze) {
+                    $varname = $this->_elements[$key]->_attributes['name'];
+                    $value = '';
+                    // If we have a default value then export it.
+                    if (isset($this->_defaultValues[$varname])) {
+                        $value = $this->prepare_fixed_value($varname, $this->_defaultValues[$varname]);
+                    }
                 } else {
                     $value = $this->_elements[$key]->exportValue($this->_submitValues, true);
                 }
@@ -1655,9 +1698,31 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
         if (is_array($this->_constantValues)) {
             $unfiltered = HTML_QuickForm::arrayMerge($unfiltered, $this->_constantValues);
         }
-
         return $unfiltered;
     }
+    /**
+     * This is a bit of a hack, and it duplicates the code in
+     * HTML_QuickForm_element::_prepareValue, but I could not think of a way or
+     * reliably calling that code. (Think about date selectors, for example.)
+     * @param string $name the element name.
+     * @param mixed $value the fixed value to set.
+     * @return mixed the appropriate array to add to the $unfiltered array.
+     */
+    protected function prepare_fixed_value($name, $value) {
+        if (null === $value) {
+            return null;
+        } else {
+            if (!strpos($name, '[')) {
+                return array($name => $value);
+            } else {
+                $valueAry = array();
+                $myIndex  = "['" . str_replace(array(']', '['), array('', "']['"), $name) . "']";
+                eval("\$valueAry$myIndex = \$value;");
+                return $valueAry;
+            }
+        }
+    }
+
     /**
      * Adds a validation rule for the given field
      *
