@@ -62,6 +62,7 @@ class mod_assign_generator extends phpunit_module_generator {
             'sendnotifications'                 => 0,
             'sendlatenotifications'             => 0,
             'duedate'                           => 0,
+            'displayduedate'                    => 0,
             'allowsubmissionsfromdate'          => 0,
             'assignsubmission_onlinetext_enabled' => 0,
             'assignsubmission_file_enabled'     => 0,

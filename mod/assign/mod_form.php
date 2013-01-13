@@ -86,6 +86,10 @@ class mod_assign_mod_form extends moodleform_mod {
         $mform->addHelpButton('duedate', 'duedate', 'assign');
         $mform->setDefault('duedate', time()+7*24*3600);
 
+        $mform->addElement('selectyesno', 'displayduedate', get_string('displayduedate', 'assign'));
+ 	$mform->addHelpButton('displayduedate', 'displayduedate', 'assign');
+ 	$mform->setDefault('displayduedate', 0);
+        
         $name = get_string('cutoffdate', 'assign');
         $mform->addElement('date_time_selector', 'cutoffdate', $name, array('optional'=>true));
         $mform->addHelpButton('cutoffdate', 'cutoffdate', 'assign');
