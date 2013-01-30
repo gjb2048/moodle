@@ -257,14 +257,14 @@ function assign_get_coursemodule_info($coursemodule) {
             $result->content = format_module_intro('assign', $assignment, $coursemodule->id, false);
         }
     }
-    
-    if (($assignment->duedate > 0) &&($assignment->displayduedate)) {
+
+    if (($assignment->duedate > 0) && ($assignment->displayduedate)) {
         if (empty($result->content)){
             $result->content = '';
         }
-        $result->content .= '<p>' . get_string('duedate', 'assign') . ': ' . userdate($assignment->duedate) . '</p>';
+        $result->content .= html_writer::tag('p', get_string('duedate', 'assign') . ': ' . userdate($assignment->duedate));
     }
-    
+
     return $result;
 }
 
