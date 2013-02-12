@@ -455,6 +455,7 @@ class assign {
         $update->sendnotifications = $formdata->sendnotifications;
         $update->sendlatenotifications = $formdata->sendlatenotifications;
         $update->duedate = $formdata->duedate;
+        $update->displayduedate = $formdata->displayduedate;
         $update->cutoffdate = $formdata->cutoffdate;
         $update->allowsubmissionsfromdate = $formdata->allowsubmissionsfromdate;
         $update->grade = $formdata->grade;
@@ -756,6 +757,7 @@ class assign {
         $update->sendnotifications = $formdata->sendnotifications;
         $update->sendlatenotifications = $formdata->sendlatenotifications;
         $update->duedate = $formdata->duedate;
+        $update->displayduedate = $formdata->displayduedate;
         $update->cutoffdate = $formdata->cutoffdate;
         $update->allowsubmissionsfromdate = $formdata->allowsubmissionsfromdate;
         $update->grade = $formdata->grade;
@@ -3012,7 +3014,6 @@ class assign {
                                                       $this->get_context(),
                                                       $this->show_intro(),
                                                       $this->get_course_module()->id));
-
         if ($this->can_grade()) {
             if ($this->get_instance()->teamsubmission) {
                 $summary = new assign_grading_summary($this->count_teams(),

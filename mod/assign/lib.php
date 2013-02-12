@@ -234,8 +234,8 @@ function assign_extend_settings_navigation(settings_navigation $settings, naviga
 function assign_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    if (! $assignment = $DB->get_record('assign', array('id'=>$coursemodule->instance),
-            'id, name, alwaysshowdescription, allowsubmissionsfromdate, intro, introformat')) {
+    if (! $assignment = $DB->get_record('assign', array('id'=>$coursemodule->instance), // Final comment.
+            'id, name, alwaysshowdescription, allowsubmissionsfromdate, intro, introformat, duedate, displayduedate')) {
         return false;
     }
 
@@ -247,6 +247,14 @@ function assign_get_coursemodule_info($coursemodule) {
             $result->content = format_module_intro('assign', $assignment, $coursemodule->id, false);
         }
     }
+    
+    if (($assignment->duedate > 0) &&($assignment->displayduedate)) {
+        if (empty($result->content)){
+            $result->content = '';
+        }
+        $result->content .= '<p>' . get_string('duedate', 'assign') . ': ' . userdate($assignment->duedate) . '</p>';
+    }
+    
     return $result;
 }
 

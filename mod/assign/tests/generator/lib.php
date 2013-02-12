@@ -75,6 +75,9 @@ class mod_assign_generator extends phpunit_module_generator {
         if (!isset($record->duedate)) {
             $record->duedate = 0;
         }
+        if (!isset($record->displayduedate)) {
+            $record->displayduedate = 0;
+        }        
         if (!isset($record->allowsubmissionsfromdate)) {
             $record->allowsubmissionsfromdate = 0;
         }
