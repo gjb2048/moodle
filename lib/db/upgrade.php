@@ -1625,7 +1625,7 @@ function xmldb_main_upgrade($oldversion) {
         $sequenceconcat = $DB->sql_concat("','", 's.sequence', "','");
         $moduleconcat = $DB->sql_concat("'%,'", 'cm.id', "',%'");
         $sql = 'SELECT s2.id, s2.course, s2.sequence
-                FROM mdl_course_sections s2
+                FROM {course_sections} s2
                 JOIN(
                     SELECT DISTINCT s.id
                     FROM
