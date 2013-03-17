@@ -156,9 +156,7 @@ if ($thisdevice == "default" || $thisdevice == "tablet" || optional_param('mymob
 
 // Add the required JavaScript to the page
 $THEME->javascripts = array(
-    'jquery-1.7.1.min',
-    'custom',
-    'jquery.mobile-1.1.1'
+    'yui_mymobile'
 );
 
 // Sets a custom render factory to use with the theme, used when working with custom renderers.
