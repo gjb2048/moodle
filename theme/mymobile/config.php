@@ -34,6 +34,7 @@ $THEME->parents = array(
 
 // Set the stylesheets that we want to include for this theme
 $THEME->sheets = array(
+    'jmobile11',
     'jmobile11_rtl',
     'core',
     'media'
