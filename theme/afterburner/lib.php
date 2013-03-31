@@ -4,7 +4,12 @@ function afterburner_process_css($css, $theme) {
 
     // Set the background image for the logo
     if (!empty($theme->settings->logo)) {
-        $logo = $theme->settings->logo;
+        //$logo = $theme->settings->logo
+        global $CFG;
+        require_once($CFG->libdir.'/adminlib.php');
+        $filename = get_config('theme_afterburner','logo'); // 'theme_afterburner/logo' from settings.php.
+        $context = context_system::instance();
+        $logo = admin_setting_configfilepicker::get_file($filename, $context, 'theme_afterburner', 'logo');
     } else {
         $logo = null;
     }
@@ -26,7 +31,7 @@ function afterburner_set_logo($css, $logo) {
     $tag = '[[setting:logo]]';
     $replacement = $logo;
     if (is_null($replacement)) {
-        $replacement = $OUTPUT->pix_url('images/logo','theme');
+        $replacement = $OUTPUT->pix_url('images/logo', 'theme');
     }
 
     $css = str_replace($tag, $replacement, $css);

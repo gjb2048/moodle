@@ -8,8 +8,8 @@ if ($ADMIN->fulltree) {
     $name = 'theme_afterburner/logo';
     $title = get_string('logo','theme_afterburner');
     $description = get_string('logodesc', 'theme_afterburner');
-    $default = '';
-    $setting = new admin_setting_configtext($name, $title, $description, $default, PARAM_URL);
+    $options = array('accepted_types' => 'image');
+    $setting = new admin_setting_configfilepicker($name, $title, $description, null, $options);
     $settings->add($setting);
 
     // Foot note setting

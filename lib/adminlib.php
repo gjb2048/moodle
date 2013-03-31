@@ -2239,6 +2239,183 @@ class admin_setting_configcheckbox extends admin_setting {
     }
 }
 
+/**
+ * File picker
+ *
+ * @copyright 2013 Pau Ferrer Ocaña & Gareth J Barnard
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class admin_setting_configfilepicker extends admin_setting {
+
+    /**
+     * Information for previewing the file
+     *
+     * @var array|null
+     */
+    protected $_options = null;
+
+    /**
+     *
+     * @param string $name
+     * @param string $visiblename
+     * @param string $description
+     * @param string $defaultsetting
+     * @param array $options Array();
+     */
+    public function __construct($name, $visiblename, $description, $defaultsetting, array $options = null) {
+        $this->_options = $options;
+        $this->_options['subdirs'] = false;
+        $this->_options['maxfiles'] = 1;
+        $this->_options['context'] = context_system::instance();
+        parent::__construct($name, $visiblename, $description, $defaultsetting);
+    }
+
+    /**
+     * Return the setting
+     *
+     * @return mixed returns config if successful else null
+     */
+    public function get_setting() {
+        global $CFG;
+
+        $filename = $this->config_read($this->name);
+        //Not set
+        if (is_null($filename)) {
+            return "";
+        } else {
+            return $filename;
+        }
+
+        $context = $this->_options['context'];
+
+        $file = admin_setting_configfilepicker::get_file($filename, $context, $this->name);
+
+        if ($file == null) {
+            //Set but empty
+            return "";
+        }
+        return $file;
+    }
+
+    public static function get_file($filename, $context, $plugin, $name){
+        global $CFG;
+        $file = null;
+        $fs = get_file_storage();
+        if ($storedfile = $fs->get_file($context->id, 'configfile_'.$plugin, $name, 0, '/', $filename)){
+            $path = '/'.$context->id.'/configfile_'.$plugin.'/'.$name.'/0'.$storedfile->get_filepath().$storedfile->get_filename();
+            $file = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, false);
+        } 
+        return $file;
+    }
+
+    /**
+     * Saves the setting
+     *
+     * @param string $data
+     * @return bool
+     */
+    public function write_setting($data) {
+        $draftitemid = $this->validate($data);
+
+        $context = $this->_options['context'];
+
+        if (!$draftitemid) {
+            return  get_string('validateerror', 'admin');
+        } else {
+            file_save_draft_area_files($draftitemid, $context->id, 'configfile_'.$this->plugin, $this->name, 0, $this->_options);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($context->id, 'configfile_'.$this->plugin, $this->name, 0, 'sortorder', false);
+            if (count($files) == 1) {
+                // Only one file attached, set it as main file automatically.
+                $file = reset($files);
+                file_set_sortorder($context->id, 'configfile_'.$this->plugin, $this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
+                $filename = $file->get_filename();
+
+                return ($this->config_write($this->name, $filename) ? "" : get_string('errorsetting', 'admin'));
+            }
+        }
+
+        return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
+    }
+
+    /**
+     * Validates the file that was entered by the user
+     *
+     * @param string $data
+     * @return string|false
+     */
+    protected function validate($data) {
+        if(empty($data)) return "";
+        return $data;
+    }
+
+    /**
+     * Generates the HTML for the setting
+     *
+     * @global moodle_page $PAGE
+     * @global core_renderer $OUTPUT
+     * @param string $data
+     * @param string $query
+     */
+    public function output_html($data, $query = '') {
+        global $PAGE, $OUTPUT;
+
+        $draftitemid = file_get_unused_draft_itemid();
+
+        $args = new stdClass();
+        // need these three to filter repositories list
+        $args->accepted_types = isset($this->_options['accepted_types'])?$this->_options['accepted_types']:'*';
+        $args->return_types = FILE_INTERNAL;
+        $args->itemid = $draftitemid;
+        $args->maxbytes = isset($this->_options['maxbytes'])?$this->_options['maxbytes']:-1;
+        $args->context = $this->_options['context'];
+        $args->buttonname = $this->get_id().'filechoose';
+        $args->elementname = $this->get_full_name();
+        $args->subdirs = $this->_options['subdirs'] ;
+        $args->maxfiles = $this->_options['maxfiles'];
+        $args->filename = $this->get_setting();
+        $args->filepath = '/';
+
+        $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
+        
+        if($img = $this->get_setting()){
+            //$content .= html_writer::empty_tag('img', array('src'=> $img));
+            $content .= html_writer::start_tag('p');
+            $content .= $img;
+            $content .= html_writer::end_tag('p');
+        }
+        
+        $fp = new file_picker($args);
+        $options = $fp->options;
+        $options->context = $this->_options['context'];
+        $content .= $OUTPUT->render($fp);
+        $content .= '<input type="hidden" name="'.$this->get_full_name().'" id="'.$this->get_id().'" value="'.$draftitemid.'" class="filepickerhidden"/>';
+        
+        $module = array('name' => 'form_filepicker', 'fullpath' => '/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate'));
+        $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);
+        
+        /*$nonjsfilepicker = new moodle_url('/repository/draftfiles_manager.php', array(
+            'env'=>'filepicker',
+            'action'=>'browse',
+            'itemid'=>$draftitemid,
+            'subdirs'=>0,
+            'maxbytes'=>$options->maxbytes,
+            'maxfiles'=>1,
+            'ctx_id'=>$this->_options['context']->id,
+            'course'=>$this->_options['context']->id,
+            'sesskey'=>sesskey(),
+            ));
+
+        // non js file picker
+        
+        $content .= '<noscript>';
+        $content .= "<div><object type='text/html' data='$nonjsfilepicker' height='160' width='600' style='border:1px solid #000'></object></div>";
+        $content .= '</noscript>';*/
+
+        $content .= html_writer::end_tag('div');
+        return format_admin_setting($this, $this->visiblename, $content, $this->description, false, '', $this->get_defaultsetting(), $query);
+    }
+}
 
 /**
  * Multiple checkboxes, each represents different value, stored in csv format
