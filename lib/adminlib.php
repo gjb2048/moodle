@@ -2267,6 +2267,9 @@ class admin_setting_configfilepicker extends admin_setting {
         $this->_options['subdirs'] = false;
         $this->_options['maxfiles'] = 1;
         $this->_options['context'] = context_system::instance();
+        if (empty($this->_options['isimagefile'])) {
+            $this->_options['isimagefile'] = false;
+        }
         parent::__construct($name, $visiblename, $description, $defaultsetting);
     }
 
@@ -2282,19 +2285,19 @@ class admin_setting_configfilepicker extends admin_setting {
         //Not set
         if (is_null($filename)) {
             return "";
+        } else if ($this->_options['isimagefile'] == true) {
+            $context = $this->_options['context'];
+
+            $file = admin_setting_configfilepicker::get_file($filename, $context, $this->plugin, $this->name);
+
+            if ($file == null) {
+                //Set but empty
+                return "";
+            }
+            return $file;
         } else {
             return $filename;
         }
-
-        $context = $this->_options['context'];
-
-        $file = admin_setting_configfilepicker::get_file($filename, $context, $this->name);
-
-        if ($file == null) {
-            //Set but empty
-            return "";
-        }
-        return $file;
     }
 
     public static function get_file($filename, $context, $plugin, $name){
@@ -2378,13 +2381,16 @@ class admin_setting_configfilepicker extends admin_setting {
 
         $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
         
-        if($img = $this->get_setting()){
-            //$content .= html_writer::empty_tag('img', array('src'=> $img));
+        if($file = $this->get_setting()){
             $content .= html_writer::start_tag('p');
-            $content .= $img;
+            if ($this->_options['isimagefile'] == true) {
+                $content .= html_writer::empty_tag('img', array('src'=> $file));
+            } else {
+                $content .= $file;
+            }
             $content .= html_writer::end_tag('p');
         }
-        
+
         $fp = new file_picker($args);
         $options = $fp->options;
         $options->context = $this->_options['context'];
@@ -2394,23 +2400,22 @@ class admin_setting_configfilepicker extends admin_setting {
         $module = array('name' => 'form_filepicker', 'fullpath' => '/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate'));
         $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);
         
-        /*$nonjsfilepicker = new moodle_url('/repository/draftfiles_manager.php', array(
+        $nonjsfilepicker = new moodle_url('/repository/draftfiles_manager.php', array(
             'env'=>'filepicker',
             'action'=>'browse',
-            'itemid'=>$draftitemid,
-            'subdirs'=>0,
-            'maxbytes'=>$options->maxbytes,
-            'maxfiles'=>1,
+            'itemid'=>$args->itemid,
+            'subdirs'=>$args->subdirs,
+            'maxbytes'=>$args->maxbytes,
+            'maxfiles'=>$args->maxfiles,
             'ctx_id'=>$this->_options['context']->id,
-            'course'=>$this->_options['context']->id,
+            'course'=>$PAGE->course->id,
             'sesskey'=>sesskey(),
             ));
 
-        // non js file picker
-        
+        // Non js file picker.        
         $content .= '<noscript>';
         $content .= "<div><object type='text/html' data='$nonjsfilepicker' height='160' width='600' style='border:1px solid #000'></object></div>";
-        $content .= '</noscript>';*/
+        $content .= '</noscript>';        
 
         $content .= html_writer::end_tag('div');
         return format_admin_setting($this, $this->visiblename, $content, $this->description, false, '', $this->get_defaultsetting(), $query);

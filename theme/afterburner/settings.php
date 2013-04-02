@@ -6,15 +6,15 @@ if ($ADMIN->fulltree) {
 
     // Logo file setting
     $name = 'theme_afterburner/logo';
-    $title = get_string('logo','theme_afterburner');
+    $title = get_string('logo', 'theme_afterburner');
     $description = get_string('logodesc', 'theme_afterburner');
-    $options = array('accepted_types' => 'image');
+    $options = array('accepted_types' => 'image', 'isimagefile' => true);
     $setting = new admin_setting_configfilepicker($name, $title, $description, null, $options);
     $settings->add($setting);
 
     // Foot note setting
     $name = 'theme_afterburner/footnote';
-    $title = get_string('footnote','theme_afterburner');
+    $title = get_string('footnote', 'theme_afterburner');
     $description = get_string('footnotedesc', 'theme_afterburner');
     $default = '';
     $setting = new admin_setting_confightmleditor($name, $title, $description, $default);
@@ -22,7 +22,7 @@ if ($ADMIN->fulltree) {
 
     // Custom CSS file
     $name = 'theme_afterburner/customcss';
-    $title = get_string('customcss','theme_afterburner');
+    $title = get_string('customcss', 'theme_afterburner');
     $description = get_string('customcssdesc', 'theme_afterburner');
     $default = '';
     $setting = new admin_setting_configtextarea($name, $title, $description, $default);
