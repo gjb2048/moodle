@@ -2318,15 +2318,27 @@ class admin_setting_configfilepicker extends admin_setting {
      * @return bool
      */
     public function write_setting($data) {
+        global $USER;
+
         $draftitemid = $this->validate($data);
-
         $context = $this->_options['context'];
+        $delete = optional_param($this->get_full_name().'_delete', false, PARAM_BOOL);
 
-        if (!$draftitemid) {
-            return  get_string('validateerror', 'admin');
-        } else {
-            file_save_draft_area_files($draftitemid, $context->id, 'configfile_'.$this->plugin, $this->name, 0, $this->_options);
+        if($delete && !$draftitemid){
+            // No file sent and mark to delete.
             $fs = get_file_storage();
+            $fs->delete_area_files($context->id, 'configfile_'.$this->plugin, $this->name, 0);
+            return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
+        }
+
+        if ($draftitemid)  {
+            // File sent.
+            file_save_draft_area_files($draftitemid, $context->id, 'configfile_'.$this->plugin, $this->name, 0, $this->_options);
+
+            $fs = get_file_storage();
+            $usercontext = context_user::instance($USER->id);
+            $fs->delete_area_files($usercontext->id, 'user', 'draft', $draftitemid);
+
             $files = $fs->get_area_files($context->id, 'configfile_'.$this->plugin, $this->name, 0, 'sortorder', false);
             if (count($files) == 1) {
                 // Only one file attached, set it as main file automatically.
@@ -2338,17 +2350,29 @@ class admin_setting_configfilepicker extends admin_setting {
             }
         }
 
-        return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
+        return "";
     }
 
     /**
-     * Validates the file that was entered by the user
+     * Validates the file that was entered by the user.
      *
      * @param string $data
      * @return string|false
      */
     protected function validate($data) {
+        global $USER;
         if(empty($data)) return "";
+
+        $usercontext = context_user::instance($USER->id);
+        $fs = get_file_storage();
+
+        $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $data, 'id');
+        if (count($draftfiles) < 2) {
+            // means there are no files - one file means root dir only ;-)
+            $fs->delete_area_files($usercontext->id, 'user', 'draft', $data);
+            return "";
+        }
+
         return $data;
     }
 
@@ -2389,6 +2413,11 @@ class admin_setting_configfilepicker extends admin_setting {
                 $content .= $file;
             }
             $content .= html_writer::end_tag('p');
+        }
+
+        if ($file) {
+            $labelid = $this->get_id().'_delete';
+            $content .= '<input type="checkbox" name="'.$this->get_full_name().'_delete" id="'.$labelid.'" value="1" /><label for="'.$labelid.'">'.get_string('delete').'</label>';
         }
 
         $fp = new file_picker($args);
