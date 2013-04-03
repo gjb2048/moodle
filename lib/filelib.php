@@ -4372,17 +4372,6 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
         send_file_not_found();
 
     // ========================================================================================================================
-    } else if (strpos($component, 'theme_') === 0) {
-
-        $filename = array_pop($args);
-        if (!$file = $fs->get_file($context->id, $component, $filearea, 0, '/', $filename) or $file->is_directory()) {
-            send_file_not_found();
-        }
-
-        session_get_instance()->write_close(); // unlock session during fileserving.
-        send_stored_file($file);
-
-    // ========================================================================================================================
     } else if (strpos($component, '_') === false) {
         // all core subsystems have to be specified above, no more guessing here!
         send_file_not_found();
