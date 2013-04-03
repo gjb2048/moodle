@@ -2264,14 +2264,14 @@ class admin_setting_configfilepicker extends admin_setting {
      */
     public function __construct($name, $visiblename, $description, $defaultsetting, array $options = null) {
         parent::__construct($name, $visiblename, $description, $defaultsetting);
-        
+
         $this->_options = $options;
         $this->_options['subdirs'] = false;
         $this->_options['maxfiles'] = 1;
         $this->_options['context'] = context_system::instance();
         $this->_options['filepath'] = '/';
-        $this->_options['filename'] = $this->config_read($this->name);
-        
+        $this->_options['filename'] = $this->name;
+
         if (empty($this->_options['isimagefile'])) {
             $this->_options['isimagefile'] = false;
         }
@@ -2285,34 +2285,11 @@ class admin_setting_configfilepicker extends admin_setting {
     public function get_setting() {
         global $CFG;
 
-        $filename = $this->config_read($this->name);
-        //Not set
-        if (is_null($filename)) {
-            return "";
-        } else if ($this->_options['isimagefile'] == true) {
-            $context = $this->_options['context'];
-
-            $file = admin_setting_configfilepicker::get_file($filename, $context, $this->plugin, $this->name);
-
-            if ($file == null) {
-                //Set but empty
-                return "";
-            }
-            return $file;
-        } else {
-            return $filename;
+        if ($fileurl = $this->config_read($this->name)) {
+            $file = moodle_url::make_file_url("$CFG->httpswwwroot/pluginfile.php", $fileurl);
+            return $file->out(false);
         }
-    }
-
-    public static function get_file($filename, $context, $plugin, $name){
-        $fs = get_file_storage();
-        if ($storedfile = $fs->get_file($context->id, 'configfile_'.$plugin, $name, 0, '/', $filename)){
-			$file = moodle_url::make_pluginfile_url($context->id, 'configfile_'.$plugin, $name, 0,  '/', $filename);
-			//Prevent caching when file is changed
-			$file->param('timemodified',$storedfile->get_timemodified());
-			return $file->out(false);
-        } 
-        return null;
+        return "";
     }
 
     /**
@@ -2322,36 +2299,34 @@ class admin_setting_configfilepicker extends admin_setting {
      * @return bool
      */
     public function write_setting($data) {
-        global $USER;
 
-        $draftitemid = $this->validate($data);
         $context = $this->_options['context'];
-        $component = 'configfile_'.$this->plugin;
         $delete = optional_param($this->get_full_name().'_delete', false, PARAM_BOOL);
 
-        if($delete && !$draftitemid){
+        if ($delete) {
             // No file sent and mark to delete.
             $fs = get_file_storage();
-            $fs->delete_area_files($context->id, $component, $this->name, 0);
-            return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
+            $oldfile = $fs->get_file($context->id, $this->plugin, 'settings', 0, '/', $this->name);
+            $oldfile->delete();
+            return ($this->config_write($this->name, "") ? '' : get_string('errorsetting', 'admin'));
         }
 
-        if ($draftitemid)  {
+        $draftitemid = $this->validate($data);
+        if ($draftitemid) {
             // File sent.
-            file_save_draft_area_files($draftitemid, $context->id, $component, $this->name, 0, $this->_options);
-
             $fs = get_file_storage();
-            $usercontext = context_user::instance($USER->id);
-            $fs->delete_area_files($usercontext->id, 'user', 'draft', $draftitemid);
 
-            $files = $fs->get_area_files($context->id, $component, $this->name, 0, 'sortorder', false);
+            file_save_draft_area_files($draftitemid, $context->id, $this->plugin, 'settings', 0, $this->_options);
+
+            $files = $fs->get_area_files($context->id, $this->plugin, 'settings', 0, 'sortorder', false);
             if (count($files) == 1) {
                 // Only one file attached, set it as main file automatically.
                 $file = reset($files);
-                file_set_sortorder($context->id, $component, $this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
-                $filename = $file->get_filename();
-                
-                return ($this->config_write($this->name, $filename) ? "" : get_string('errorsetting', 'admin'));
+                file_set_sortorder($context->id, $this->plugin, 'settings', 0, $file->get_filepath(), $file->get_filename(), 1);
+
+                // Save the relative path into the config_plugins table (to be cached).
+                $fileurl = "/{$context->id}/{$this->plugin}/settings/".$file->get_timemodified()."/{$this->name}";
+                return ($this->config_write($this->name, $fileurl) ? "" : get_string('errorsetting', 'admin'));
             }
         }
 
@@ -2366,14 +2341,17 @@ class admin_setting_configfilepicker extends admin_setting {
      */
     protected function validate($data) {
         global $USER;
-        if(empty($data)) return "";
+
+        if (empty($data)) {
+            return "";
+        }
 
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
 
         $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $data, 'id');
         if (count($draftfiles) < 2) {
-            // means there are no files - one file means root dir only ;-)
+            // means there are no files - one file means root dir only ;-).
             $fs->delete_area_files($usercontext->id, 'user', 'draft', $data);
             return "";
         }
@@ -2391,13 +2369,13 @@ class admin_setting_configfilepicker extends admin_setting {
      */
     public function output_html($data, $query = '') {
         global $PAGE, $OUTPUT;
-        
- 		$id      = $this->get_id();
-		$elname  = $this->get_full_name();
-		$context = $this->_options['context'];
-		
-		$draftitemid = file_get_submitted_draft_itemid($elname);
-		file_prepare_draft_area($draftitemid, $context->id, 'configfile_'.$this->plugin,  $this->name, 0,  $this->_options);
+
+        $id      = $this->get_id();
+        $elname  = $this->get_full_name();
+        $context = $this->_options['context'];
+
+        $draftitemid = file_get_submitted_draft_itemid($elname);
+        file_prepare_draft_area($draftitemid, $context->id, $this->plugin, 'settings', 0,  $this->_options);
 
         $args = new stdClass();
         // need these three to filter repositories list
@@ -2408,19 +2386,19 @@ class admin_setting_configfilepicker extends admin_setting {
         $args->context = $context;
         $args->buttonname = $this->get_id().'filechoose';
         $args->elementname = $elname;
-        $args->subdirs = $this->_options['subdirs'] ;
+        $args->subdirs = $this->_options['subdirs'];
         $args->maxfiles = $this->_options['maxfiles'];
         $args->filename = $this->_options['filename'];
         $args->filepath = $this->_options['filepath'];
 
         $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
-        
-        if($file = $this->get_setting()){
-			if($this->_options['isimagefile'] == true){
-            	$image = html_writer::empty_tag('img', array('src'=> $file));
-            	$content .= html_writer::tag('p',$image);
-			}
-            
+
+        if ($file = $this->get_setting()) {
+            if ($this->_options['isimagefile'] == true) {
+                $image = html_writer::empty_tag('img', array('src'=> $file));
+                $content .= html_writer::tag('p', $image);
+            }
+
             $labelid = $this->get_id().'_delete';
             $content .= '<input type="checkbox" name="'.$elname.'_delete" id="'.$labelid.'" value="1" /><label for="'.$labelid.'">'.get_string('delete').'</label>';
         }
@@ -2430,10 +2408,10 @@ class admin_setting_configfilepicker extends admin_setting {
         $options->context = $context;
         $content .= $OUTPUT->render($fp);
         $content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" value="'.$draftitemid.'" class="filepickerhidden"/>';
-        
+
         $module = array('name' => 'form_filepicker', 'fullpath' => '/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate'));
         $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);
-        
+
         $nonjsfilepicker = new moodle_url('/repository/draftfiles_manager.php', array(
             'env'=>'filepicker',
             'action'=>'browse',
@@ -2446,10 +2424,10 @@ class admin_setting_configfilepicker extends admin_setting {
             'sesskey'=>sesskey(),
             ));
 
-        // Non js file picker.        
+        // Non js file picker.
         $content .= '<noscript>';
         $content .= "<div><object type='text/html' data='$nonjsfilepicker' height='160' width='600' style='border:1px solid #000'></object></div>";
-        $content .= '</noscript>';        
+        $content .= '</noscript>';
 
         $content .= html_writer::end_tag('div');
         return format_admin_setting($this, $this->visiblename, $content, $this->description, false, '', $this->get_defaultsetting(), $query);
