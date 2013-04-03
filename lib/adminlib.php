@@ -2264,7 +2264,7 @@ class admin_setting_configfilepicker extends admin_setting {
      */
     public function __construct($name, $visiblename, $description, $defaultsetting, array $options = null) {
         parent::__construct($name, $visiblename, $description, $defaultsetting);
-        
+
         $this->_options = $options;
         $this->_options['subdirs'] = false;
         $this->_options['maxfiles'] = 1;
@@ -2286,7 +2286,7 @@ class admin_setting_configfilepicker extends admin_setting {
         global $CFG;
 
         $filename = $this->config_read($this->name);
-        //Not set
+        // Not set.
         if (is_null($filename)) {
             return "";
         } else if ($this->_options['isimagefile'] == true) {
@@ -2295,7 +2295,7 @@ class admin_setting_configfilepicker extends admin_setting {
             $file = admin_setting_configfilepicker::get_file($filename, $context, $this->plugin, $this->name);
 
             if ($file == null) {
-                //Set but empty
+                // Set but empty.
                 return "";
             }
             return $file;
@@ -2307,10 +2307,10 @@ class admin_setting_configfilepicker extends admin_setting {
     public static function get_file($filename, $context, $plugin, $name){
         $fs = get_file_storage();
         if ($storedfile = $fs->get_file($context->id, 'configfile_'.$plugin, $name, 0, '/', $filename)){
-			$file = moodle_url::make_pluginfile_url($context->id, 'configfile_'.$plugin, $name, 0,  '/', $filename);
-			//Prevent caching when file is changed
-			$file->param('timemodified',$storedfile->get_timemodified());
-			return $file->out(false);
+            $file = moodle_url::make_pluginfile_url($context->id, 'configfile_'.$plugin, $name, 0,  '/', $filename);
+            // Prevent caching when file is changed.
+            $file->param('timemodified', $storedfile->get_timemodified());
+            return $file->out(false);
         } 
         return null;
     }
@@ -2336,7 +2336,7 @@ class admin_setting_configfilepicker extends admin_setting {
             return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
         }
 
-        if ($draftitemid)  {
+        if ($draftitemid) {
             // File sent.
             file_save_draft_area_files($draftitemid, $context->id, $component, $this->name, 0, $this->_options);
 
@@ -2391,16 +2391,16 @@ class admin_setting_configfilepicker extends admin_setting {
      */
     public function output_html($data, $query = '') {
         global $PAGE, $OUTPUT;
-        
- 		$id      = $this->get_id();
-		$elname  = $this->get_full_name();
-		$context = $this->_options['context'];
-		
-		$draftitemid = file_get_submitted_draft_itemid($elname);
-		file_prepare_draft_area($draftitemid, $context->id, 'configfile_'.$this->plugin,  $this->name, 0,  $this->_options);
+
+        $id      = $this->get_id();
+        $elname  = $this->get_full_name();
+        $context = $this->_options['context'];
+
+        $draftitemid = file_get_submitted_draft_itemid($elname);
+        file_prepare_draft_area($draftitemid, $context->id, 'configfile_'.$this->plugin,  $this->name, 0,  $this->_options);
 
         $args = new stdClass();
-        // need these three to filter repositories list
+        // Need these three to filter repositories list.
         $args->accepted_types = isset($this->_options['accepted_types'])?$this->_options['accepted_types']:'*';
         $args->return_types = FILE_INTERNAL;
         $args->itemid = $draftitemid;
@@ -2414,13 +2414,13 @@ class admin_setting_configfilepicker extends admin_setting {
         $args->filepath = $this->_options['filepath'];
 
         $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
-        
+
         if($file = $this->get_setting()){
-			if($this->_options['isimagefile'] == true){
-            	$image = html_writer::empty_tag('img', array('src'=> $file));
-            	$content .= html_writer::tag('p',$image);
-			}
-            
+            if($this->_options['isimagefile'] == true){
+                $image = html_writer::empty_tag('img', array('src'=> $file));
+                $content .= html_writer::tag('p',$image);
+            }
+
             $labelid = $this->get_id().'_delete';
             $content .= '<input type="checkbox" name="'.$elname.'_delete" id="'.$labelid.'" value="1" /><label for="'.$labelid.'">'.get_string('delete').'</label>';
         }
@@ -2430,10 +2430,10 @@ class admin_setting_configfilepicker extends admin_setting {
         $options->context = $context;
         $content .= $OUTPUT->render($fp);
         $content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" value="'.$draftitemid.'" class="filepickerhidden"/>';
-        
+
         $module = array('name' => 'form_filepicker', 'fullpath' => '/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate'));
         $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);
-        
+
         $nonjsfilepicker = new moodle_url('/repository/draftfiles_manager.php', array(
             'env'=>'filepicker',
             'action'=>'browse',
@@ -2446,7 +2446,7 @@ class admin_setting_configfilepicker extends admin_setting {
             'sesskey'=>sesskey(),
             ));
 
-        // Non js file picker.        
+        // Non js file picker.
         $content .= '<noscript>';
         $content .= "<div><object type='text/html' data='$nonjsfilepicker' height='160' width='600' style='border:1px solid #000'></object></div>";
         $content .= '</noscript>';        
