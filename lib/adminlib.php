@@ -2416,13 +2416,10 @@ class admin_setting_configfilepicker extends admin_setting {
         $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
         
         if($file = $this->get_setting()){
-            $content .= html_writer::start_tag('p');
-            if ($this->_options['isimagefile'] == true) {
-                $content .= html_writer::empty_tag('img', array('src'=> $file));
-            } else {
-                $content .= $file;
-            }
-            $content .= html_writer::end_tag('p');
+			if($this->_options['isimagefile'] == true){
+            	$image = html_writer::empty_tag('img', array('src'=> $file));
+            	$content .= html_writer::tag('p',$image);
+			}
             
             $labelid = $this->get_id().'_delete';
             $content .= '<input type="checkbox" name="'.$elname.'_delete" id="'.$labelid.'" value="1" /><label for="'.$labelid.'">'.get_string('delete').'</label>';
