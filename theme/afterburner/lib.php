@@ -1,15 +1,18 @@
 <?php
 
 function afterburner_process_css($css, $theme) {
-
+	global $CFG;
+	
     // Set the background image for the logo
     if (!empty($theme->settings->logo)) {
-        //$logo = $theme->settings->logo
-        global $CFG;
-        require_once($CFG->libdir.'/adminlib.php');
-        $filename = get_config('theme_afterburner','logo'); // 'theme_afterburner/logo' from settings.php.
-        $context = context_system::instance();
-        $logo = admin_setting_configfilepicker::get_file($filename, $context, 'theme_afterburner', 'logo');
+        $cache = cache::make('theme_afterburner', 'settings');
+		if (!$logo = $cache->get('logo')) {
+			require_once($CFG->libdir.'/adminlib.php');
+			$filename = get_config('theme_afterburner','logo'); // 'theme_afterburner/logo' from settings.php.
+			$context = context_system::instance();
+			$logo = admin_setting_configfilepicker::get_file($filename, $context, 'theme_afterburner', 'logo');
+			$cache->set('logo', $logo);
+		}
     } else {
         $logo = null;
     }

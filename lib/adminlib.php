@@ -2305,14 +2305,14 @@ class admin_setting_configfilepicker extends admin_setting {
     }
 
     public static function get_file($filename, $context, $plugin, $name){
-        global $CFG;
-        $file = null;
         $fs = get_file_storage();
         if ($storedfile = $fs->get_file($context->id, 'configfile_'.$plugin, $name, 0, '/', $filename)){
-            $path = '/'.$context->id.'/configfile_'.$plugin.'/'.$name.'/0'.$storedfile->get_filepath().$storedfile->get_filename();
-            $file = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path, false);
+			$file = moodle_url::make_pluginfile_url($context->id, 'configfile_'.$plugin, $name, 0,  '/', $filename);
+			//Prevent caching when file is changed
+			$file->param('timemodified',$storedfile->get_timemodified());
+			return $file->out(false);
         } 
-        return $file;
+        return null;
     }
 
     /**
@@ -2326,30 +2326,31 @@ class admin_setting_configfilepicker extends admin_setting {
 
         $draftitemid = $this->validate($data);
         $context = $this->_options['context'];
+        $component = 'configfile_'.$this->plugin;
         $delete = optional_param($this->get_full_name().'_delete', false, PARAM_BOOL);
 
         if($delete && !$draftitemid){
             // No file sent and mark to delete.
             $fs = get_file_storage();
-            $fs->delete_area_files($context->id, 'configfile_'.$this->plugin, $this->name, 0);
+            $fs->delete_area_files($context->id, $component, $this->name, 0);
             return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
         }
 
         if ($draftitemid)  {
             // File sent.
-            file_save_draft_area_files($draftitemid, $context->id, 'configfile_'.$this->plugin, $this->name, 0, $this->_options);
+            file_save_draft_area_files($draftitemid, $context->id, $component, $this->name, 0, $this->_options);
 
             $fs = get_file_storage();
             $usercontext = context_user::instance($USER->id);
             $fs->delete_area_files($usercontext->id, 'user', 'draft', $draftitemid);
 
-            $files = $fs->get_area_files($context->id, 'configfile_'.$this->plugin, $this->name, 0, 'sortorder', false);
+            $files = $fs->get_area_files($context->id, $component, $this->name, 0, 'sortorder', false);
             if (count($files) == 1) {
                 // Only one file attached, set it as main file automatically.
                 $file = reset($files);
-                file_set_sortorder($context->id, 'configfile_'.$this->plugin, $this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
+                file_set_sortorder($context->id, $component, $this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
                 $filename = $file->get_filename();
-
+                
                 return ($this->config_write($this->name, $filename) ? "" : get_string('errorsetting', 'admin'));
             }
         }
