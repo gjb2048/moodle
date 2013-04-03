@@ -19,7 +19,7 @@
  *
  * @package    theme
  * @subpackage afterburner
- * @copyright  2013 Pau Ferrer Ocaña
+ * @copyright  2013 Pau Ferrer OcaÃ±a
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since Moodle 2.6
  */
