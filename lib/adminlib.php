@@ -2422,7 +2422,7 @@ class admin_setting_configfilepicker extends admin_setting {
             }
 
             $labelid = $this->get_id().'_delete';
-            $content .= '<input type="checkbox" name="'.$elname.'_delete" id="'.$labelid.'" value="1" /><label for="'.$labelid.'">'.get_string('delete').'</label>';
+            $content .= '<input type="checkbox" name="'.$elname.'_delete" id="'.$labelid.'" value="1" /><label for="'.$labelid.'">&nbsp;'.get_string('delete').'</label>';
         }
 
         $fp = new file_picker($args);
