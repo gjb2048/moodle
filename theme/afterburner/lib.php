@@ -71,3 +71,19 @@ function afterburner_set_customcss($css, $customcss) {
 
     return $css;
 }
+
+function theme_afterburner_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    if ($filearea === 'settings' and $context->contextlevel == CONTEXT_SYSTEM) {
+        array_shift($args); // ignore revision - designed to prevent caching problems only
+
+        $fs = get_file_storage();
+        $relativepath = implode('/', $args);
+
+        $fullpath = rtrim("/$context->id/theme_afterburner/settings/0/$relativepath", '/');
+        if ($file = $fs->get_file_by_hash(sha1($fullpath))) {
+            send_stored_file($file, 86400, 0, $forcedownload, $options);
+        }
+        // file_send_public_settings_file('theme_afterburner', 'settings', $args, $forcedownload, $options);
+    }
+    return false;
+}
