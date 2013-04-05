@@ -24,20 +24,15 @@
  */
 
 function afterburner_process_css($css, $theme) {
-    global $CFG;
-
     // Set the background image for the logo.
+    $logo = null;
     if (!empty($theme->settings->logo)) {
-        $cache = cache::make('theme_afterburner', 'settings');
-        if (!$logo = $cache->get('logo')) {
-            require_once($CFG->libdir.'/adminlib.php');
-            $filename = get_config('theme_afterburner','logo'); // 'theme_afterburner/logo' from settings.php.
+        if ($logofilename = get_config('theme_afterburner', 'logo')) { // ... 'theme_afterburner/logo' from settings.php.
             $context = context_system::instance();
-            $logo = admin_setting_configfilepicker::get_file($filename, $context, 'theme_afterburner', 'logo');
-            $cache->set('logo', $logo);
+            $logofile = moodle_url::make_pluginfile_url($context->id, 'theme_afterburner', 'logo', theme_get_revision(), '/', $logofilename);
+            echo $logofile->out(false);
+            $logo = $logofile->out(false);
         }
-    } else {
-        $logo = null;
     }
     $css = afterburner_set_logo($css, $logo);
 
@@ -78,13 +73,14 @@ function afterburner_set_customcss($css, $customcss) {
 }
 
 function theme_afterburner_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    if ($filearea === 'settings' and $context->contextlevel == CONTEXT_SYSTEM) {
+    if ($context->contextlevel == CONTEXT_SYSTEM) {
         array_shift($args); // ignore revision - designed to prevent caching problems only
 
         $fs = get_file_storage();
         $relativepath = implode('/', $args);
 
-        $fullpath = rtrim("/$context->id/theme_afterburner/settings/0/$relativepath", '/');
+        $fullpath = "/{$context->id}/theme_afterburner/{$filearea}/0/{$relativepath}";
+        $fullpath = rtrim($fullpath, '/');
         if ($file = $fs->get_file_by_hash(sha1($fullpath))) {
             send_stored_file($file, 86400, 0, $forcedownload, $options);
         }
