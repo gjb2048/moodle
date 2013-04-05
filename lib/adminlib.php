@@ -2270,7 +2270,6 @@ class admin_setting_configfilepicker extends admin_setting {
         $this->_options['maxfiles'] = 1;
         $this->_options['context'] = context_system::instance();
         $this->_options['filepath'] = '/';
-        $this->_options['filename'] = $this->name;
 
         if (empty($this->_options['isimagefile'])) {
             $this->_options['isimagefile'] = false;
@@ -2285,9 +2284,14 @@ class admin_setting_configfilepicker extends admin_setting {
     public function get_setting() {
         global $CFG;
 
-        if ($fileurl = $this->config_read($this->name)) {
-            $file = moodle_url::make_file_url("$CFG->httpswwwroot/pluginfile.php", $fileurl);
-            return $file->out(false);
+        if ($filename = $this->config_read($this->name)) {
+            $fs = get_file_storage();
+            $context = $this->_options['context'];
+            $file = $fs->get_file($context->id, $this->plugin, $this->name, 0, $this->_options['filepath'], $filename);
+            if ($file) {
+                $file = moodle_url::make_pluginfile_url($context->id,  $this->plugin, $this->name, $file->get_timemodified(), '/', $filename);
+                return $file->out(false);
+            }
         }
         return "";
     }
@@ -2306,27 +2310,24 @@ class admin_setting_configfilepicker extends admin_setting {
         if ($delete) {
             // No file sent and mark to delete.
             $fs = get_file_storage();
-            $oldfile = $fs->get_file($context->id, $this->plugin, 'settings', 0, '/', $this->name);
-            $oldfile->delete();
+            $fs->delete_area_files($context->id, $this->plugin, $this->name, 0);
             return ($this->config_write($this->name, "") ? '' : get_string('errorsetting', 'admin'));
         }
 
         $draftitemid = $this->validate($data);
         if ($draftitemid) {
             // File sent.
+            file_save_draft_area_files($draftitemid, $context->id, $this->plugin, $this->name, 0, $this->_options);
+
             $fs = get_file_storage();
-
-            file_save_draft_area_files($draftitemid, $context->id, $this->plugin, 'settings', 0, $this->_options);
-
-            $files = $fs->get_area_files($context->id, $this->plugin, 'settings', 0, 'sortorder', false);
+            $files = $fs->get_area_files($context->id, $this->plugin, $this->name, 0, 'sortorder', false);
             if (count($files) == 1) {
                 // Only one file attached, set it as main file automatically.
                 $file = reset($files);
-                file_set_sortorder($context->id, $this->plugin, 'settings', 0, $file->get_filepath(), $file->get_filename(), 1);
+                file_set_sortorder($context->id, $this->plugin, $this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
 
                 // Save the relative path into the config_plugins table (to be cached).
-                $fileurl = "/{$context->id}/{$this->plugin}/settings/".$file->get_timemodified()."/{$this->name}";
-                return ($this->config_write($this->name, $fileurl) ? "" : get_string('errorsetting', 'admin'));
+                return ($this->config_write($this->name, $file->get_filename()) ? "" : get_string('errorsetting', 'admin'));
             }
         }
 
@@ -2375,7 +2376,7 @@ class admin_setting_configfilepicker extends admin_setting {
         $context = $this->_options['context'];
 
         $draftitemid = file_get_submitted_draft_itemid($elname);
-        file_prepare_draft_area($draftitemid, $context->id, $this->plugin, 'settings', 0,  $this->_options);
+        file_prepare_draft_area($draftitemid, $context->id, $this->plugin, $this->name, 0,  $this->_options);
 
         $args = new stdClass();
         // need these three to filter repositories list
@@ -2388,7 +2389,6 @@ class admin_setting_configfilepicker extends admin_setting {
         $args->elementname = $elname;
         $args->subdirs = $this->_options['subdirs'];
         $args->maxfiles = $this->_options['maxfiles'];
-        $args->filename = $this->_options['filename'];
         $args->filepath = $this->_options['filepath'];
 
         $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
