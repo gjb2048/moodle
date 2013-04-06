@@ -25,12 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/theme/lib.php");
-
 function afterburner_process_css($css, $theme) {
     // Set the background image for the logo.
     $logo = null;
     if (!empty($theme->settings->logo)) {
+        global $CFG;
+        require_once("$CFG->dirroot/theme/lib.php");
+
         $logo = theme_get_file_from_setting('theme_afterburner', 'logo');  // ... 'theme_afterburner/logo' from settings.php.
     }
     $css = afterburner_set_logo($css, $logo);
@@ -84,5 +85,12 @@ function afterburner_set_customcss($css, $customcss) {
  * @return bool false if file not found, true if found.
  */
 function theme_afterburner_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    return theme_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, 'theme_afterburner');
+    global $CFG;
+    if ($filearea === 'theme_afterburner_logo') {
+        require_once("$CFG->dirroot/theme/lib.php");
+        return theme_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, 'theme_afterburner');
+    } else {
+        require_once("$CFG->libdir/filelib.php");
+        send_file_not_found();
+    }
 }

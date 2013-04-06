@@ -2255,6 +2255,12 @@ class admin_setting_configfilepicker extends admin_setting {
     protected $_options = null;
 
     /**
+     * States if the stored file is an image.
+     * @var bool
+     */
+    private $isimage = false;
+
+    /**
      *
      * @param string $name
      * @param string $visiblename
@@ -2287,9 +2293,16 @@ class admin_setting_configfilepicker extends admin_setting {
         if ($filename = $this->config_read($this->name)) {
             $fs = get_file_storage();
             $context = $this->_options['context'];
-            $file = $fs->get_file($context->id, $this->plugin, $this->name, 0, $this->_options['filepath'], $filename);
+            $file = $fs->get_file($context->id, $this->plugin, $this->plugin.'_'.$this->name, 0, $this->_options['filepath'], $filename);
             if ($file) {
-                $file = moodle_url::make_pluginfile_url($context->id, $this->plugin, $this->name, 0, '/', $filename);
+                switch(substr($file->get_mimetype(),0,5)) {
+                case 'image':
+                    $this->isimage = true;
+                    break;
+                default:
+                    $this->isimage = false;
+                }
+                $file = moodle_url::make_pluginfile_url($context->id, $this->plugin, $this->plugin.'_'.$this->name, 0, '/', $filename);
                 return $file->out(false);
             }
         }
@@ -2310,20 +2323,21 @@ class admin_setting_configfilepicker extends admin_setting {
         if ($delete) {
             // No file sent and mark to delete.
             $fs = get_file_storage();
-            $fs->delete_area_files($context->id, $this->plugin, $this->name, 0);
+            $fs->delete_area_files($context->id, $this->plugin, $this->plugin.'_'.$this->name, 0);
             return ($this->config_write($this->name, "") ? '' : get_string('errorsetting', 'admin'));
         }
+
         $draftitemid = $this->validate($data);
         if ($draftitemid) {
             // File sent.
-            file_save_draft_area_files($draftitemid, $context->id, $this->plugin, $this->name, 0, $this->_options);
+            file_save_draft_area_files($draftitemid, $context->id, $this->plugin, $this->plugin.'_'.$this->name, 0, $this->_options);
 
             $fs = get_file_storage();
-            $files = $fs->get_area_files($context->id, $this->plugin, $this->name, 0, 'sortorder', false);
+            $files = $fs->get_area_files($context->id, $this->plugin, $this->plugin.'_'.$this->name, 0, 'sortorder', false);
             if (count($files) == 1) {
                 // Only one file attached, set it as main file automatically.
                 $file = reset($files);
-                file_set_sortorder($context->id, $this->plugin, $this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
+                file_set_sortorder($context->id, $this->plugin, $this->plugin.'_'.$this->name, 0, $file->get_filepath(), $file->get_filename(), 1);
 
                 // Save the relative path into the config_plugins table (to be cached).
                 return ($this->config_write($this->name, $file->get_filename()) ? "" : get_string('errorsetting', 'admin'));
@@ -2376,7 +2390,7 @@ class admin_setting_configfilepicker extends admin_setting {
 
         $draftitemid = file_get_submitted_draft_itemid($elname);
         //$draftitemid = file_get_unused_draft_itemid();
-        file_prepare_draft_area($draftitemid, $context->id, $this->plugin, $this->name, 0,  $this->_options);
+        file_prepare_draft_area($draftitemid, $context->id, $this->plugin, $this->plugin.'_'.$this->name, 0,  $this->_options);
 
         $args = new stdClass();
         // need these three to filter repositories list
@@ -2394,7 +2408,7 @@ class admin_setting_configfilepicker extends admin_setting {
         $content  = html_writer::start_tag('div', array('class'=>'form-filepicker'));
 
         if ($file = $this->get_setting()) {
-            if ($this->_options['isimagefile'] == true) {
+            if ($this->isimage == true) {
                 $image = html_writer::empty_tag('img', array('src'=> $file));
                 $content .= html_writer::tag('p', $image);
             }

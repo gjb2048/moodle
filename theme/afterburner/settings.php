@@ -30,7 +30,7 @@ if ($ADMIN->fulltree) {
     $name = 'theme_afterburner/logo';
     $title = get_string('logo', 'theme_afterburner');
     $description = get_string('logodesc', 'theme_afterburner');
-    $options = array('accepted_types' => 'image', 'isimagefile' => true);
+    $options = array('accepted_types' => 'image');
     $setting = new admin_setting_configfilepicker($name, $title, $description, null, $options);
     $setting->set_updatedcallback('theme_reset_all_caches');
     $settings->add($setting);

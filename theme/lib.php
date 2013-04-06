@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->libdir/filelib.php");
-
 /**
  * Gets file from the provided settings.
  *
@@ -38,7 +36,7 @@ function theme_get_file_from_setting($theme, $setting) {
     $file = null;
     if ($filename = get_config($theme, $setting)) {
         $context = context_system::instance();
-        $thefile = moodle_url::make_pluginfile_url($context->id, $theme, $setting, theme_get_revision(), '/', $filename);
+        $thefile = moodle_url::make_pluginfile_url($context->id, $theme, $theme.'_'.$setting, theme_get_revision(), '/', $filename);
         echo $thefile->out(false);
         $file = $thefile->out(false);
     }
@@ -59,6 +57,9 @@ function theme_get_file_from_setting($theme, $setting) {
  * @return bool false if file not found, true if found.
  */
 function theme_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $theme, array $options=array()) {
+    global $CFG;
+    require_once("$CFG->libdir/filelib.php");
+
     if ($context->contextlevel == CONTEXT_SYSTEM) {
         array_shift($args); // ignore revision - designed to prevent caching problems only
 
