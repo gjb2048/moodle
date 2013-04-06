@@ -2289,7 +2289,7 @@ class admin_setting_configfilepicker extends admin_setting {
             $context = $this->_options['context'];
             $file = $fs->get_file($context->id, $this->plugin, $this->name, 0, $this->_options['filepath'], $filename);
             if ($file) {
-                $file = moodle_url::make_pluginfile_url($context->id,  $this->plugin, $this->name, $file->get_timemodified(), '/', $filename);
+                $file = moodle_url::make_pluginfile_url($context->id, $this->plugin, $this->name, 0, '/', $filename);
                 return $file->out(false);
             }
         }
@@ -2313,7 +2313,6 @@ class admin_setting_configfilepicker extends admin_setting {
             $fs->delete_area_files($context->id, $this->plugin, $this->name, 0);
             return ($this->config_write($this->name, "") ? '' : get_string('errorsetting', 'admin'));
         }
-
         $draftitemid = $this->validate($data);
         if ($draftitemid) {
             // File sent.
@@ -2376,6 +2375,7 @@ class admin_setting_configfilepicker extends admin_setting {
         $context = $this->_options['context'];
 
         $draftitemid = file_get_submitted_draft_itemid($elname);
+        //$draftitemid = file_get_unused_draft_itemid();
         file_prepare_draft_area($draftitemid, $context->id, $this->plugin, $this->name, 0,  $this->_options);
 
         $args = new stdClass();
@@ -2408,6 +2408,7 @@ class admin_setting_configfilepicker extends admin_setting {
         $options->context = $context;
         $content .= $OUTPUT->render($fp);
         $content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" value="'.$draftitemid.'" class="filepickerhidden"/>';
+        //$content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" class="filepickerhidden"/>';
 
         $module = array('name' => 'form_filepicker', 'fullpath' => '/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate'));
         $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);

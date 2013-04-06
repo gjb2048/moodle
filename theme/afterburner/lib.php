@@ -23,16 +23,15 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->dirroot/theme/lib.php");
+
 function afterburner_process_css($css, $theme) {
     // Set the background image for the logo.
     $logo = null;
     if (!empty($theme->settings->logo)) {
-        if ($logofilename = get_config('theme_afterburner', 'logo')) { // ... 'theme_afterburner/logo' from settings.php.
-            $context = context_system::instance();
-            $logofile = moodle_url::make_pluginfile_url($context->id, 'theme_afterburner', 'logo', theme_get_revision(), '/', $logofilename);
-            echo $logofile->out(false);
-            $logo = $logofile->out(false);
-        }
+        $logo = theme_get_file_from_setting('theme_afterburner', 'logo');  // ... 'theme_afterburner/logo' from settings.php.
     }
     $css = afterburner_set_logo($css, $logo);
 
@@ -72,19 +71,18 @@ function afterburner_set_customcss($css, $customcss) {
     return $css;
 }
 
+/**
+ * Serves the stored file from the provided settings.
+ *
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, true if found.
+ */
 function theme_afterburner_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    if ($context->contextlevel == CONTEXT_SYSTEM) {
-        array_shift($args); // ignore revision - designed to prevent caching problems only
-
-        $fs = get_file_storage();
-        $relativepath = implode('/', $args);
-
-        $fullpath = "/{$context->id}/theme_afterburner/{$filearea}/0/{$relativepath}";
-        $fullpath = rtrim($fullpath, '/');
-        if ($file = $fs->get_file_by_hash(sha1($fullpath))) {
-            send_stored_file($file, 86400, 0, $forcedownload, $options);
-        }
-        // file_send_public_settings_file('theme_afterburner', 'settings', $args, $forcedownload, $options);
-    }
-    return false;
+    return theme_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, 'theme_afterburner');
 }
