@@ -2276,10 +2276,6 @@ class admin_setting_configfilepicker extends admin_setting {
         $this->_options['maxfiles'] = 1;
         $this->_options['context'] = context_system::instance();
         $this->_options['filepath'] = '/';
-
-        if (empty($this->_options['isimagefile'])) {
-            $this->_options['isimagefile'] = false;
-        }
     }
 
     /**

@@ -36,7 +36,7 @@ function theme_get_file_from_setting($theme, $setting) {
     $file = null;
     if ($filename = get_config($theme, $setting)) {
         $context = context_system::instance();
-        $thefile = moodle_url::make_pluginfile_url($context->id, $theme, $theme.'_'.$setting, theme_get_revision(), '/', $filename);
+        $thefile = moodle_url::make_pluginfile_url($context->id, $theme, $theme.'_'.$setting, 0, '/', $filename);
         echo $thefile->out(false);
         $file = $thefile->out(false);
     }
