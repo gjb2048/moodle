@@ -2384,15 +2384,15 @@ class admin_setting_configfilepicker extends admin_setting {
         $elname  = $this->get_full_name();
         $context = $this->_options['context'];
 
-        $draftitemid = file_get_submitted_draft_itemid($elname);
-        //$draftitemid = file_get_unused_draft_itemid();
-        file_prepare_draft_area($draftitemid, $context->id, $this->plugin, $this->plugin.'_'.$this->name, 0,  $this->_options);
+        //$olddraftitemid = file_get_submitted_draft_itemid($elname);
+        $newdraftitemid = file_get_unused_draft_itemid();
+        file_prepare_draft_area($newdraftitemid, $context->id, $this->plugin, $this->plugin.'_'.$this->name, 0,  $this->_options);
 
         $args = new stdClass();
         // need these three to filter repositories list
         $args->accepted_types = isset($this->_options['accepted_types'])?$this->_options['accepted_types']:'*';
         $args->return_types = FILE_INTERNAL;
-        $args->itemid = $draftitemid;
+        $args->itemid = $newdraftitemid;
         $args->maxbytes = isset($this->_options['maxbytes'])?$this->_options['maxbytes']:-1;
         $args->context = $context;
         $args->buttonname = $this->get_id().'filechoose';
@@ -2417,8 +2417,7 @@ class admin_setting_configfilepicker extends admin_setting {
         $options = $fp->options;
         $options->context = $context;
         $content .= $OUTPUT->render($fp);
-        $content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" value="'.$draftitemid.'" class="filepickerhidden"/>';
-        //$content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" class="filepickerhidden"/>';
+        $content .= '<input type="hidden" name="'.$elname.'" id="'.$id.'" value="'.$newdraftitemid.'" class="filepickerhidden"/>';
 
         $module = array('name' => 'form_filepicker', 'fullpath' => '/lib/form/filepicker.js', 'requires' => array('core_filepicker', 'node', 'node-event-simulate'));
         $PAGE->requires->js_init_call('M.form_filepicker.init', array($fp->options), true, $module);
