@@ -2261,7 +2261,7 @@ class admin_setting_configfilepicker extends admin_setting {
     private $isimage = false;
 
     /**
-     *
+     * Constructor
      * @param string $name
      * @param string $visiblename
      * @param string $description
@@ -2281,7 +2281,7 @@ class admin_setting_configfilepicker extends admin_setting {
     /**
      * Return the setting
      *
-     * @return mixed returns config if successful else null
+     * @return string Resulting URL if successful else empty string.
      */
     public function get_setting() {
         global $CFG;
@@ -2309,7 +2309,7 @@ class admin_setting_configfilepicker extends admin_setting {
      * Saves the setting
      *
      * @param string $data
-     * @return bool
+     * @return bool|string
      */
     public function write_setting($data) {
 
@@ -2347,7 +2347,7 @@ class admin_setting_configfilepicker extends admin_setting {
      * Validates the file that was entered by the user.
      *
      * @param string $data
-     * @return string|false
+     * @return string containing the draft item id|empty string
      */
     protected function validate($data) {
         global $USER;
@@ -2361,7 +2361,7 @@ class admin_setting_configfilepicker extends admin_setting {
 
         $draftfiles = $fs->get_area_files($usercontext->id, 'user', 'draft', $data, 'id');
         if (count($draftfiles) < 2) {
-            // means there are no files - one file means root dir only ;-).
+            // Means there are no files - one file means root dir only ;-).
             $fs->delete_area_files($usercontext->id, 'user', 'draft', $data);
             return "";
         }
@@ -2376,6 +2376,7 @@ class admin_setting_configfilepicker extends admin_setting {
      * @global core_renderer $OUTPUT
      * @param string $data
      * @param string $query
+     * @return format_admin_setting
      */
     public function output_html($data, $query = '') {
         global $PAGE, $OUTPUT;
@@ -2384,12 +2385,11 @@ class admin_setting_configfilepicker extends admin_setting {
         $elname  = $this->get_full_name();
         $context = $this->_options['context'];
 
-        //$olddraftitemid = file_get_submitted_draft_itemid($elname);
         $newdraftitemid = file_get_unused_draft_itemid();
         file_prepare_draft_area($newdraftitemid, $context->id, $this->plugin, $this->plugin.'_'.$this->name, 0,  $this->_options);
 
         $args = new stdClass();
-        // need these three to filter repositories list
+        // Need these three to filter repositories list.
         $args->accepted_types = isset($this->_options['accepted_types'])?$this->_options['accepted_types']:'*';
         $args->return_types = FILE_INTERNAL;
         $args->itemid = $newdraftitemid;

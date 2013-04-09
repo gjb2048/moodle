@@ -25,6 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Pre-process the CSS.
+ * @param string $css CSS to process.
+ * @param string $theme Theme object.
+ * @return string Processed CSS.
+ */
 function afterburner_process_css($css, $theme) {
     // Set the background image for the logo.
     $logo = null;
@@ -47,11 +53,17 @@ function afterburner_process_css($css, $theme) {
     return $css;
 }
 
+/**
+ * Pre-process the CSS for the logo.
+ * @param string $css CSS to process.
+ * @param string $theme Theme object.
+ * @return string Processed CSS.
+ */
 function afterburner_set_logo($css, $logo) {
-    global $OUTPUT;
     $tag = '[[setting:logo]]';
     $replacement = $logo;
     if (is_null($replacement)) {
+        global $OUTPUT;
         $replacement = $OUTPUT->pix_url('images/logo', 'theme');
     }
 
@@ -60,6 +72,12 @@ function afterburner_set_logo($css, $logo) {
     return $css;
 }
 
+/**
+ * Pre-process the CSS to add any additional custom CSS.
+ * @param string $css CSS to process.
+ * @param string $theme Theme object.
+ * @return string Processed CSS.
+ */
 function afterburner_set_customcss($css, $customcss) {
     $tag = '[[setting:customcss]]';
     $replacement = $customcss;
