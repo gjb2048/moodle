@@ -86,8 +86,15 @@ class mod_assign_mod_form extends moodleform_mod {
         $name = get_string('duedate', 'assign').$assignment->get_renderer()->help_icon('duedate', 'assign');
         $duedateelements[] = $mform->createElement('date_time_selector', 'duedate', $name);
         $duedateelements[] = $mform->createElement('checkbox', 'duedateenable', null, get_string('enable'));
-        if ($assignment->get_instance()->duedate > 0) {
-            $mform->setDefault('duedate', $assignment->get_instance()->duedate);
+
+        try {
+            $duedate = $assignment->get_instance()->duedate;
+        }
+        catch (Exception $e) {
+            $duedate = 0;
+        }
+        if ($duedate > 0) {
+            $mform->setDefault('duedate', $duedate);
             $mform->setDefault('duedateenable', 1);
         } else {
             $mform->setDefault('duedate', time()+7*24*3600);
