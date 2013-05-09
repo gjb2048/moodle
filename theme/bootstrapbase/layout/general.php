@@ -40,20 +40,22 @@ if (empty($PAGE->layout_options['nocourseheaderfooter'])) {
 }
 
 $layout = 'pre-and-post';
-if ($showsidepre && !$showsidepost) {
-    if (!right_to_left()) {
-        $layout = 'side-pre-only';
-    } else {
-        $layout = 'side-post-only';
+if (!$PAGE->user_is_editing()) {
+    if ($showsidepre && !$showsidepost) {
+        if (!right_to_left()) {
+            $layout = 'side-pre-only';
+        } else {
+            $layout = 'side-post-only';
+        }
+    } else if ($showsidepost && !$showsidepre) {
+        if (!right_to_left()) {
+            $layout = 'side-post-only';
+        } else {
+            $layout = 'side-pre-only';
+        }
+    } else if (!$showsidepost && !$showsidepre) {
+        $layout = 'content-only';
     }
-} else if ($showsidepost && !$showsidepre) {
-    if (!right_to_left()) {
-        $layout = 'side-post-only';
-    } else {
-        $layout = 'side-pre-only';
-    }
-} else if (!$showsidepost && !$showsidepre) {
-    $layout = 'content-only';
 }
 $bodyclasses[] = $layout;
 
