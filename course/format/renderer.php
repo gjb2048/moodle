@@ -774,15 +774,20 @@ abstract class format_section_renderer_base extends plugin_renderer_base {
 
             echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
 
-            // Increase number of sections.
-            $straddsection = get_string('increasesections', 'moodle');
-            $url = new moodle_url('/course/changenumsections.php',
-                array('courseid' => $course->id,
-                      'increase' => true,
-                      'sesskey' => sesskey()));
-            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-            echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
-
+            $max = get_config('moodlecourse', 'maxsections');
+            if (!isset($max) || !is_numeric($max)) {
+                $max = 52;
+            }
+            if ($course->numsections < $max) {
+                // Increase number of sections.
+                $straddsection = get_string('increasesections', 'moodle');
+                $url = new moodle_url('/course/changenumsections.php',
+                    array('courseid' => $course->id,
+                          'increase' => true,
+                          'sesskey' => sesskey()));
+                $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
+                echo html_writer::link($url, $icon . get_accesshide($straddsection), array('class' => 'increase-sections'));
+            }
             if ($course->numsections > 0) {
                 // Reduce number of sections sections.
                 $strremovesection = get_string('reducesections', 'moodle');
