@@ -217,6 +217,11 @@ class format_topics extends format_base {
             if (!isset($max) || !is_numeric($max)) {
                 $max = 52;
             }
+            $this->courseid = required_param('id', PARAM_INT);
+            $course = $this->get_course();
+            if ($course->numsections > $max) {
+                $max = $course->numsections;
+            }
             $sectionmenu = array();
             for ($i = 0; $i <= $max; $i++) {
                 $sectionmenu[$i] = "$i";
