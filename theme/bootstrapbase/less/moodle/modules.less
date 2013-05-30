@@ -83,18 +83,18 @@ select {
 }
 
 .navbar .logininfo a {
-    color: @navbarLinkColor;
+    color: @linkColor;
 }
 .navbar .logininfo a:hover {
     background-color: @navbarLinkBackgroundHover; // "transparent" is default to differentiate :hover/:focus from .active
-    color: @navbarLinkColorHover;
+    color: @linkColorHover;
 }
 .navbar-inverse .logininfo a {
-    color: @navbarInverseLinkColor;
+    color: lighten(@linkColor, 5%);
 }
 .navbar-inverse .logininfo a:hover {
     background-color: @navbarInverseLinkBackgroundHover; // "transparent" is default to differentiate :hover/:focus from .active
-    color: @navbarInverseLinkColorHover;
+    color: lighten(@linkColor, 15%);
 }
 
 .navbar-fixed-top,
