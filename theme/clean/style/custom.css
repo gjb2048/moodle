@@ -16,6 +16,19 @@ a.logo {
     float: right;
 }
 
+.navbar .logininfo a {
+    color: #08c;
+}
+.navbar .logininfo a:hover {
+    color: #005580;
+}
+.navbar-inverse .logininfo a {
+    color: #999;
+}
+.navbar-inverse .logininfo a:hover {
+    color: #fff;
+}
+
 /* Custom CSS Settings
 -------------------------*/
 [[setting:customcss]]
