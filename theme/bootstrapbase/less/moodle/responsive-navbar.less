@@ -1,0 +1,26 @@
+//
+// Responsive: Navbar
+// --------------------------------------------------
+
+
+// TABLETS AND BELOW
+// -----------------
+@media (max-width: @navbarCollapseWidth) {
+  // To negate bootstrapbase/responsive-navbar.less
+  // REFIX THE TOPBAR
+  // ----------------
+  // Refix the navbars
+  .navbar-fixed-top,
+  .navbar-fixed-bottom {
+    position: fixed;
+  }
+}
+
+@media (max-width: 767px) {
+   // To negate bootstrapbase/responsive-767px-max.less
+  .navbar-fixed-top,
+  .navbar-fixed-bottom {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+}
