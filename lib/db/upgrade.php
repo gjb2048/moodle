@@ -1524,7 +1524,7 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2012120300.04);
     }
 
-    if ($oldversion < 2012120300.07) {
+    if ($oldversion < 2012123000.00) {
         // Purge removed module filters and all their settings.
 
         $tables = array('filter_active', 'filter_config');
@@ -1561,7 +1561,7 @@ function xmldb_main_upgrade($oldversion) {
         unset($filter);
 
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2012120300.07);
+        upgrade_main_savepoint(true, 2012123000.00);
     }
 
     if ($oldversion < 2013021100.01) {
@@ -2137,6 +2137,30 @@ function xmldb_main_upgrade($oldversion) {
 
         // Main savepoint reached.
         upgrade_main_savepoint(true, 2013042300.00);
+    }
+
+    // Moodle v2.5.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2013051400.01) {
+        // Fix incorrect cc-nc url. Unfortunately the license 'plugins' do
+        // not give a mechanism to do this.
+
+        $sql = "UPDATE {license}
+                   SET source = :url, version = :newversion
+                 WHERE shortname = :shortname AND version = :oldversion";
+
+        $params = array(
+            'url' => 'http://creativecommons.org/licenses/by-nc/3.0/',
+            'shortname' => 'cc-nc',
+            'newversion' => '2013051500',
+            'oldversion' => '2010033100'
+        );
+
+        $DB->execute($sql, $params);
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2013051400.01);
     }
 
     return true;

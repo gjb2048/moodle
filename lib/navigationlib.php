@@ -899,8 +899,9 @@ class navigation_node_collection implements IteratorAggregate {
         $child = $this->get($key, $type);
         if ($child !== false) {
             foreach ($this->collection as $colkey => $node) {
-                if ($node->key == $key && $node->type == $type) {
+                if ($node->key === $key && $node->type == $type) {
                     unset($this->collection[$colkey]);
+                    $this->collection = array_values($this->collection);
                     break;
                 }
             }
@@ -2498,7 +2499,7 @@ class global_navigation extends navigation_node {
         }
 
         //Badges
-        if (!empty($CFG->enablebadges) && has_capability('moodle/badges:viewbadges', $this->page->context)) {
+        if (!empty($CFG->enablebadges) && !empty($CFG->badges_allowcoursebadges) && has_capability('moodle/badges:viewbadges', $this->page->context)) {
             $url = new moodle_url($CFG->wwwroot . '/badges/view.php', array('type' => 1));
             $coursenode->add(get_string('sitebadges', 'badges'), $url, navigation_node::TYPE_CUSTOM);
         }
@@ -3489,7 +3490,7 @@ class settings_navigation extends navigation_node {
             $coursenode->force_open();
         }
 
-        if (has_capability('moodle/course:update', $coursecontext)) {
+        if ($this->page->user_allowed_editing()) {
             // Add the turn on/off settings
 
             if ($this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
@@ -3509,8 +3510,10 @@ class settings_navigation extends navigation_node {
                 $editurl->param('edit', 'on');
                 $editstring = get_string('turneditingon');
             }
-            $coursenode->add($editstring, $editurl, self::TYPE_SETTING, null, null, new pix_icon('i/edit', ''));
+            $coursenode->add($editstring, $editurl, self::TYPE_SETTING, null, 'turneditingonoff', new pix_icon('i/edit', ''));
+        }
 
+        if (has_capability('moodle/course:update', $coursecontext)) {
             // Add the course settings link
             $url = new moodle_url('/course/edit.php', array('id'=>$course->id));
             $coursenode->add(get_string('editsettings'), $url, self::TYPE_SETTING, null, 'editsettings', new pix_icon('i/settings', ''));
@@ -3518,7 +3521,7 @@ class settings_navigation extends navigation_node {
             // Add the course completion settings link
             if ($CFG->enablecompletion && $course->enablecompletion) {
                 $url = new moodle_url('/course/completion.php', array('id'=>$course->id));
-                $coursenode->add(get_string('completion', 'completion'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
+                $coursenode->add(get_string('coursecompletion', 'completion'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));
             }
         }
 
@@ -4244,7 +4247,7 @@ class settings_navigation extends navigation_node {
         }
         $frontpage->id = 'frontpagesettings';
 
-        if (has_capability('moodle/course:update', $coursecontext)) {
+        if ($this->page->user_allowed_editing()) {
 
             // Add the turn on/off settings
             $url = new moodle_url('/course/view.php', array('id'=>$course->id, 'sesskey'=>sesskey()));
@@ -4256,7 +4259,9 @@ class settings_navigation extends navigation_node {
                 $editstring = get_string('turneditingon');
             }
             $frontpage->add($editstring, $url, self::TYPE_SETTING, null, null, new pix_icon('i/edit', ''));
+        }
 
+        if (has_capability('moodle/course:update', $coursecontext)) {
             // Add the course settings link
             $url = new moodle_url('/admin/settings.php', array('section'=>'frontpagesettings'));
             $frontpage->add(get_string('editsettings'), $url, self::TYPE_SETTING, null, null, new pix_icon('i/settings', ''));

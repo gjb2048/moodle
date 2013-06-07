@@ -1,7 +1,7 @@
 @core @core_backup
 Feature: Restore Moodle 2 course backups
   In order to continue using my stored course contents
-  As a moodle teacher and as a moodle admin
+  As a teacher and an admin
   I need to restore them inside other Moodle courses or in new courses
 
   Background:
@@ -88,7 +88,7 @@ Feature: Restore Moodle 2 course backups
       | id_startdate_year | 2020 |
       | id_format | Weekly format |
     And I press "Save changes"
-    And I should see "1 January - 7 January"
+    And I should see "1 January -  7 January"
     And I should see "Test forum name"
     And I follow "Edit settings"
     And I expand all fieldsets
