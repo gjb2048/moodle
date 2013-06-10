@@ -36,8 +36,11 @@ $hasheader = (empty($PAGE->layout_options['noheader']));
 $hassidepre = (empty($PAGE->layout_options['noblocks']) && $PAGE->blocks->region_has_content('side-pre', $OUTPUT));
 $hassidepost = (empty($PAGE->layout_options['noblocks']) && $PAGE->blocks->region_has_content('side-post', $OUTPUT));
 
-$showsidepre = ($hassidepre && !$PAGE->blocks->region_completely_docked('side-pre', $OUTPUT));
-$showsidepost = ($hassidepost && !$PAGE->blocks->region_completely_docked('side-post', $OUTPUT));
+//$showsidepre = ($hassidepre && !$PAGE->blocks->region_completely_docked('side-pre', $OUTPUT));
+//$showsidepost = ($hassidepost && !$PAGE->blocks->region_completely_docked('side-post', $OUTPUT));
+// TODO: Fix when docking fixed.
+$showsidepre = $hassidepre;
+$showsidepost = $hassidepost;
 
 // If there can be a sidepost region on this page and we are editing, always
 // show it so blocks can be dragged into it.
@@ -169,27 +172,28 @@ echo $OUTPUT->doctype() ?>
     </section>
 
 
-<?php if ($layout !== 'content-only') {
-          if ($layout === 'pre-and-post') { ?>
-            <aside class="span4 desktop-first-column">
-    <?php } else if ($layout === 'side-pre-only') { ?>
-            <aside class="span3 desktop-first-column">
-    <?php } ?>
-          <div id="region-pre" class="block-region">
-          <div class="region-content">
-          <?php
-                if (!right_to_left()) {
-                    echo $OUTPUT->blocks_for_region('side-pre');
-                } else if ($hassidepost) {
-                    echo $OUTPUT->blocks_for_region('side-post');
-                }
-          ?>
-          </div>
-          </div>
-          </aside>
-    <?php if ($layout === 'pre-and-post') {
-          ?></div></div><?php // Close row-fluid and span9.
-   }
+<?php if ($layout !== 'content-only') { 
+          if ($layout !== 'side-post-only') {
+              if ($layout === 'pre-and-post') { ?>
+                <aside class="span4 desktop-first-column">
+        <?php } else if ($layout === 'side-pre-only') { ?>
+                <aside class="span3 desktop-first-column">
+        <?php } ?>
+              <div id="region-pre" class="block-region">
+              <div class="region-content">
+              <?php
+                    if (!right_to_left()) {
+                        echo $OUTPUT->blocks_for_region('side-pre');
+                    } else if ($hassidepost) {
+                        echo $OUTPUT->blocks_for_region('side-post');
+                    } ?>
+              </div>
+              </div>
+              </aside>
+        <?php if ($layout === 'pre-and-post') {
+              ?></div></div><?php // Close row-fluid and span9.
+        }
+    }
 
     if ($layout === 'side-post-only' OR $layout === 'pre-and-post') { ?>
         <aside class="span3">
