@@ -53,7 +53,7 @@
     font-size: 12px;
     color: #333;
     background: #F2F2F2;
-    .border-radius(10px);
+    border-radius: 10px;
     border: 1px solid #ccc;
     border-top: 0 none;
     .box-shadow(5px 5px 20px 0 #666);
@@ -150,9 +150,9 @@
     width: 7em;
     padding: 0.5em;
     margin-bottom: 1.8em;
-    background-color: @grayLighter;
-    border: 1px solid darken(spin(@grayLighter, -10), 7%);
-    .border-radius(2px);
+    background-color: @gray-lighter;
+    border: 1px solid darken(spin(@gray-lighter, -10), 7%);
+    border-radius: 2px;
 }
 .que h2.no {
     margin: 0;
@@ -186,7 +186,7 @@
 }
 .que .formulation {
     .alert-info;
-    color: @textColor;
+    color: @text-color;
 }
 .formulation input[type="text"],
 .formulation select {
@@ -202,8 +202,8 @@
     .alert-success;
 }
 .que .history {
-    color: @textColor;
-    background: @grayLighter;
+    color: @text-color;
+    background: @gray-lighter;
 }
 .que .ablock {
     margin: 0.7em 0 0.3em 0;
@@ -229,24 +229,24 @@
 .que .correctness {
     .label;
     &.correct {
-        background-color: @successText;
+        background-color: @state-success-text;
     }
     &.partiallycorrect {
-        background-color: @orange;
+        background-color: @label-warning-bg;
     }
     &.notanswered,
     &.incorrect {
-        background-color: @errorText;
+        background-color: @state-danger-text;
     }
 }
 .que .validationerror {
-    color: @errorText;
+    color: @state-danger-text;
 }
 // copied from .formFieldState in mixin.less
 // and made more specific
-.answerState(@textColor, @backgroundColor) {
-    @borderColor: @textColor;
-    color: @textColor;
+.answerState(@text-color, @backgroundColor) {
+    @borderColor: @text-color;
+    color: @text-color;
     background-color: @backgroundColor;
     border-color: @borderColor;
     .box-shadow(inset 0 1px 1px rgba(0,0,0,.075)); // Redeclare so transitions work
@@ -258,25 +258,25 @@
 }
 
 .formulation .correct {
-    background-color: @successBackground;
+    background-color: @state-success-bg;
 }
 .formulation .partiallycorrect {
-    background-color: @warningBackground;
+    background-color: @state-warning-bg;
 }
 .formulation .incorrect {
-    background-color: @errorBackground;
+    background-color: @state-danger-bg;
 }
 .formulation select.correct,
 .formulation input.correct {
-  .answerState(@successText, @successBackground);
+  .answerState(@state-success-text, @state-success-bg);
 }
 .formulation select.partiallycorrect,
 .formulation input.partiallycorrect {
-  .answerState(@warningText, @warningBackground);
+  .answerState(@state-warning-text, @state-warning-bg);
 }
 .formulation select.incorrect,
 .formulation input.incorrect {
-  .answerState(@errorText, @errorBackground);
+  .answerState(@state-danger-text, @state-danger-bg);
 }
 
 .que .grading,
@@ -338,15 +338,15 @@
 
 #page-mod-quiz-edit .questionbankwindow div.header a:link,
 #page-mod-quiz-edit .questionbankwindow div.header a:visited {
-    color: @linkColor;
+    color: @link-color;
 }
 
 #page-mod-quiz-edit .questionbankwindow div.header a:hover {
-    color: @linkColorHover;
+    color: @link-hover-color;
 }
 
 #page-mod-quiz-edit .questionbankwindow div.header .title {
-    color: @textColor;
+    color: @text-color;
 }
 
 #page-mod-quiz-edit div.container div.generalbox {
@@ -355,7 +355,7 @@
 }
 
 #page-mod-quiz-edit .categoryinfo {
-    background-color: @bodyBackground;
+    background-color: @body-bg;
     border-bottom: none;
 }
 
@@ -378,20 +378,20 @@
     margin: 0 -1.2em -1em -1.2em;
 }
 #page-mod-quiz-edit div.question div.content div.questioncontrols {
-    background-color: @bodyBackground;
+    background-color: @body-bg;
 }
 #page-mod-quiz-edit div.question div.content div.points {
     margin-top: -0.5em;
     padding-bottom: 0.5em;
     border: none;
-    background-color: @bodyBackground;
+    background-color: @body-bg;
 }
 #page-mod-quiz-edit div.question div.content div.points label {
     display: inline-block;
 }
 
 #page-mod-quiz-edit div.quizpage .pagecontent .pagestatus {
-    background-color: @bodyBackground;
+    background-color: @body-bg;
 }
 
 #page-mod-quiz-edit .quizpagedelete,
@@ -401,7 +401,7 @@
 
 #page-mod-quiz-edit div.quizpage .pagecontent {
     border: 1px solid #ddd;
-    .border-radius(2px);
+    border-radius: 2px;
     overflow: hidden;
 }
 
@@ -414,9 +414,9 @@
 }
 
 #page-mod-quiz-edit div.editq div.question div.content {
-    background-color: @bodyBackground;
+    background-color: @body-bg;
     border: 1px solid #ddd;
-    .border-radius(2px);
+    border-radius: 2px;
     overflow: hidden;
 }
 
@@ -426,7 +426,7 @@
 }
 
 a#hidebankcmd {
-    color: @linkColor;
+    color: @link-color;
 }
 
 // override question plugins

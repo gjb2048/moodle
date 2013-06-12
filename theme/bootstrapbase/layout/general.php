@@ -85,14 +85,14 @@ echo $OUTPUT->doctype() ?>
 
 <header role="banner" class="navbar navbar-fixed-top">
     <nav role="navigation" class="navbar-inner">
-        <div class="container-fluid">
-            <a class="brand" href="<?php echo $CFG->wwwroot;?>"><?php echo $SITE->shortname; ?></a>
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <div class="container">
+            <a class="navbar-brand" href="<?php echo $CFG->wwwroot;?>"><?php echo $SITE->shortname; ?></a>
+            <button type="button" class="btn navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-            </a>
-            <div class="nav-collapse collapse">
+            </button>
+            <div class="nav-collapse collapse navbar-responsive-collapse">
             <?php if ($hascustommenu) {
                 echo $custommenu;
             } ?>
@@ -105,7 +105,7 @@ echo $OUTPUT->doctype() ?>
     </nav>
 </header>
 
-<div id="page" class="container-fluid">
+<div id="page" class="container">
 
 <?php if ($hasheader) { ?>
 <header id="page-header" class="clearfix">
@@ -121,18 +121,18 @@ echo $OUTPUT->doctype() ?>
 </header>
 <?php } ?>
 
-<div id="page-content" class="row-fluid">
+<div id="page-content" class="row">
 
 <?php if ($layout === 'pre-and-post') { ?>
-    <div id="region-bs-main-and-pre" class="span9">
-    <div class="row-fluid">
-    <section id="region-main" class="span8 pull-right">
+    <div id="region-bs-main-and-pre" class="col col-lg-9">
+    <div class="row">
+    <section id="region-main" class="col col-lg-8 pull-right">
 <?php } else if ($layout === 'side-post-only') { ?>
-    <section id="region-main" class="span9">
+    <section id="region-main" class="col col-lg-9">
 <?php } else if ($layout === 'side-pre-only') { ?>
-    <section id="region-main" class="span9 pull-right">
+    <section id="region-main" class="col col-lg-9 pull-right">
 <?php } else if ($layout === 'content-only') { ?>
-    <section id="region-main" class="span12">
+    <section id="region-main" class="col col-lg-12">
 <?php } ?>
 
 
@@ -144,9 +144,9 @@ echo $OUTPUT->doctype() ?>
 
 <?php if ($layout !== 'content-only') {
           if ($layout === 'pre-and-post') { ?>
-            <aside class="span4 desktop-first-column">
+            <aside class="col col-lg-4 desktop-first-column">
     <?php } else if ($layout === 'side-pre-only') { ?>
-            <aside class="span3 desktop-first-column">
+            <aside class="col col-lg-3 desktop-first-column">
     <?php } ?>
           <div id="region-pre" class="block-region">
           <div class="region-content">
@@ -160,11 +160,11 @@ echo $OUTPUT->doctype() ?>
           </div>
           </aside>
     <?php if ($layout === 'pre-and-post') {
-          ?></div></div><?php // Close row-fluid and span9.
+          ?></div></div><?php // Close row and col-lg-9.
    }
 
     if ($layout === 'side-post-only' OR $layout === 'pre-and-post') { ?>
-        <aside class="span3">
+        <aside class="col col-lg-3">
         <div id="region-post" class="block-region">
         <div class="region-content">
         <?php if (!right_to_left()) {

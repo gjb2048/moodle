@@ -23,14 +23,14 @@
 }
 .path-backup .notification.dependencies_enforced {
     text-align: center;
-    color: @errorText;
+    color: @state-danger-text;
     font-weight: bold;
 }
 .path-backup .backup_progress {
     text-align: center;
 }
 .path-backup .backup_progress .backup_stage {
-    .muted
+    .text-muted
 }
 .path-backup .backup_progress .backup_stage.backup_stage_current {
     font-weight: bold;
@@ -42,12 +42,12 @@
     color: inherit;
 }
 #page-backup-restore .filealiasesfailures {
-    background-color: @errorBackground;
+    background-color: @state-danger-bg;
 }
 #page-backup-restore .filealiasesfailures .aliaseslist {
     width: 90%;
     margin: 0.8em auto;
-    background-color: @bodyBackground;
+    background-color: @body-bg;
     border: 1px dotted #666;
 }
 .path-backup .fitem .smallicon {
@@ -60,10 +60,10 @@
     display: block;
     width: 100%;
     padding: 0;
-    margin-bottom: @baseLineHeight;
-    font-size: @baseFontSize * 1.5;
-    line-height: @baseLineHeight * 2;
-    color: @grayDark;
+    margin-bottom: @line-height-base;
+    font-size: @font-size-base * 1.5;
+    line-height: @line-height-base * 2;
+    color: @gray-dark;
     border: 0;
     border-bottom: 1px solid #e5e5e5;
 }
@@ -75,7 +75,6 @@
 .backup-restore .backup-section.settings-section .detail-pair {
     width: 50%;
     display: inline-block;
-    .ie7-inline-block();
 }
 .backup-restore .backup-section.settings-section .detail-pair-label {
     width: 65%;
@@ -97,7 +96,6 @@
 }
 .backup-restore .detail-pair-label {
     display: inline-block;
-    .ie7-inline-block();
     width: 25%;
     padding: 8px;
     margin: 0;
@@ -107,15 +105,14 @@
 }
 .backup-restore .detail-pair-value {
     display: inline-block;
-    .ie7-inline-block();
     width: 65%;
     padding: 8px;
     margin: 0;
 }
 .backup-restore .detail-pair-value > .sub-detail {
     display: block;
-    font-size: @fontSizeSmall;
-    .muted
+    font-size: @font-size-small;
+    .text-muted
 }
 .backup-restore > .singlebutton {
     text-align: right;
