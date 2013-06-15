@@ -14,6 +14,47 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+$ltr = (!right_to_left());  // Also used to know if to add 'pull-right' and 'desktop-first-column' classes in the layout for LTR.
+$pre = 'side-pre';
+$post = 'side-post';
+/*
+ This copes with the value of 'regions' being 'side-pre' or 'side-post' in 'config.php'.
+ If there is a 'side-pre' then use it, the RTL logic above means that 'side-post' will be in $useblock but then this
+ will be converted back to 'side-pre' by the swapping code in the method 'block' as it uses the '$THEME->blockrtlmanipulations'
+ array in 'config.php'.  If there is not a 'side-pre' and a 'side-post' has not been defined then this is a developers coding
+ fault in 'config.php' and therefore would need to be reported.
+*/
+if (!$ltr) { // In RTL the sides are reversed, so swap the 'blocks' method parameter.
+    // Swap....
+    $temp = $pre;
+    $pre = $post;
+    $post = $temp;
+}
+$hassidepre = (empty($PAGE->layout_options['noblocks']) && $PAGE->blocks->region_has_content('side-pre', $OUTPUT));
+if ($hassidepre) {
+    $useblock = $pre;
+    /*
+     This deals with the side to show the blocks on.
+     If we have a 'side-pre' then the blocks are on the left for LTR and right for RTL.
+    */
+    if ($ltr) {
+        $left = true;
+    } else {
+        $left = false;
+    }
+} else {
+    $useblock = $post;
+    /*
+     This deals with the side to show the blocks on.
+     If we have a 'side-post' then the blocks are on the right for LTR and left for RTL.
+    */
+    if ($ltr) {
+        $left = false;
+    } else {
+        $left = true;
+    }
+}
+
 echo $OUTPUT->doctype() ?>
 <html <?php echo $OUTPUT->htmlattributes(); ?>>
 <head>
@@ -61,25 +102,19 @@ echo $OUTPUT->doctype() ?>
     </header>
 
     <div id="page-content" class="row-fluid">
-        <div id="region-bs-main-and-pre" class="span9">
-            <div class="row-fluid">
-                <section id="region-main" class="span9 pull-right">
-                    <?php
-                    echo $OUTPUT->course_content_header();
-                    echo $OUTPUT->main_content();
-                    echo $OUTPUT->course_content_footer();
-                    ?>
-                </section>
-                <?php
-                if (!right_to_left()) {
-                    echo $OUTPUT->blocks('side-pre', 'span3 desktop-first-column');
-                } ?>
-            </div>
-        </div>
+        <section id="region-main" class="span9<?php if ($left) { echo ' pull-right'; } ?>">
+            <?php
+            echo $OUTPUT->course_content_header();
+            echo $OUTPUT->main_content();
+            echo $OUTPUT->course_content_footer();
+            ?>
+        </section>
         <?php
-        if (right_to_left()) {
-            echo $OUTPUT->blocks('side-post', 'span3');
+        $classextra = '';
+        if ($left) {
+            $classextra = ' desktop-first-column';
         }
+        echo $OUTPUT->blocks($useblock, 'span3'.$classextra);
         ?>
     </div>
 
