@@ -547,7 +547,16 @@ class assign {
         $update->requiresubmissionstatement = $formdata->requiresubmissionstatement;
         $update->sendnotifications = $formdata->sendnotifications;
         $update->sendlatenotifications = $formdata->sendlatenotifications;
-        $update->duedate = $formdata->duedate;
+        if (empty($formdata->duedateenable)) {
+            $update->duedate = 0;
+        } else {
+            $update->duedate = $formdata->duedate;
+        }
+        if (empty($formdata->displayduedate)) {
+            $update->displayduedate = 0;
+        } else {
+            $update->displayduedate = $formdata->displayduedate;
+        }
         $update->cutoffdate = $formdata->cutoffdate;
         $update->allowsubmissionsfromdate = $formdata->allowsubmissionsfromdate;
         $update->grade = $formdata->grade;
@@ -872,7 +881,16 @@ class assign {
         $update->requiresubmissionstatement = $formdata->requiresubmissionstatement;
         $update->sendnotifications = $formdata->sendnotifications;
         $update->sendlatenotifications = $formdata->sendlatenotifications;
-        $update->duedate = $formdata->duedate;
+        if (empty($formdata->duedateenable)) {
+            $update->duedate = 0;
+        } else {
+            $update->duedate = $formdata->duedate;
+        }
+        if (empty($formdata->displayduedate)) {
+            $update->displayduedate = 0;
+        } else {
+            $update->displayduedate = $formdata->displayduedate;
+        }
         $update->cutoffdate = $formdata->cutoffdate;
         $update->allowsubmissionsfromdate = $formdata->allowsubmissionsfromdate;
         $update->grade = $formdata->grade;
