@@ -114,7 +114,7 @@
     margin: 0.5em;
     padding: 0.5em;
     text-align: center;
-    .border-radius(5px);
+    border-radius: 5px;
 }
 #page-grade-grading-manage .action:hover {
     text-decoration: none;
@@ -128,7 +128,7 @@
     padding: 0.5em;
     border: 2px solid #CCC;
     text-align: center;
-    .border-radius(5px);
+    border-radius: 5px;
     position: relative;
 }
 #page-grade-grading-manage #actionresultmessagebox span {
@@ -143,7 +143,7 @@ font-size: 80%}
     font-size: 60%;
     padding: 0.25em;
     border: 1px solid #EEE;
-    .border-radius(5px);
+    border-radius: 5px;
 }
 #page-grade-grading-manage .definition-name .status.ready {
     background-color: #e7f1c3;
@@ -170,7 +170,7 @@ font-size: 80%}
     font-size: 60%;
     padding: 0.25em;
     border: 1px solid #eee;
-    .border-radius(5px);
+    border-radius: 5px;
 }
 #page-grade-grading-pick .template-name .type.shared {
     background-color: #e7f1c3;
@@ -206,13 +206,13 @@ font-size: 80%}
 #page-grade-grading-pick .template-actions .action.pick {
     background-color: #EEE;
     border: 2px solid #CCC;
-    .border-radius(3px);
+    border-radius: 3px;
 }
 #page-grade-grading-pick .template-actions .action:hover {
     text-decoration: none;
     background-color: #F6F6F6;
     border: 2px solid #CCC;
-    .border-radius(3px);
+    border-radius: 3px;
 }
 #page-grade-grading-pick .template-actions .action .action-text {
     display: inline;
@@ -273,18 +273,18 @@ margin:0;
 border:0;
 }
 .path-grade-report-grader #overDiv .feedback {
-font-size: @fontSizeMini;
+font-size: @font-size-mini;
 background-color:#ABF;
 font-weight:400;
 }
 .path-grade-report-grader #overDiv .caption {
-font-size: @fontSizeMini;
+font-size: @font-size-mini;
 background-color:#56C;
 color:#CCF;
 font-weight:700;
 }
 .path-grade-report-grader #overDiv .intersection {
-font-size: @fontSizeMini;
+font-size: @font-size-mini;
 background-color:#ABF;
 color:#000;
 font-weight:400;
@@ -347,7 +347,7 @@ table#user-grades .quickfeedback {
 }
 
 table#user-grades .datesubmitted {
-    font-size: @fontSizeMini;
+    font-size: @font-size-mini;
 }
 
 .path-grade-report-grader span.inclusion-links {
@@ -472,12 +472,12 @@ table#user-grades input {
 }
 
 .path-grade-report-grader form td.excluded {
-    color: @errorText;
+    color: @state-danger-text;
 }
 
 .path-grade-report-grader .excludedfloater {
     font-weight: 700;
-    color: @errorText;
+    color: @state-danger-text;
     font-size: 9px;
     float: left;
 }
@@ -501,7 +501,7 @@ table#user-grades input {
 }
 
 .path-grade-report-grader .right_scroller td select {
-    font-size: @fontSizeSmall;
+    font-size: @font-size-small;
 }
 
 .path-grade-report-grader .grade_icons img.ajax {
@@ -541,7 +541,7 @@ table#fixed_column tr.controls td,
 table#user-grades tr.controls td,
 .path-grade-report-grader table tr.avg,
 .path-grade-report-grader table tr.avg:hover {
-    background-color: @infoBackground;
+    background-color: @state-info-bg;
 }
 
 .path-grade-report-grader table th.user,
@@ -556,7 +556,7 @@ table#user-grades tr.controls td,
 }
 .path-grade-report-grader .usersuspended a:link,
 .path-grade-report-grader .usersuspended a:visited {
-    .muted
+    .text-muted
 }
 
 .path-grade-report-grader table th.usersuspended img.usersuspendedicon {

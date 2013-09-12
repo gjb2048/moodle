@@ -33,7 +33,7 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
         $type = '';
 
         if ($classes == 'notifyproblem') {
-            $type = 'alert alert-error';
+            $type = 'alert alert-danger';
         }
         if ($classes == 'notifysuccess') {
             $type = 'alert alert-success';
@@ -58,8 +58,7 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
             $item->hideicon = true;
             $breadcrumbs[] = $this->render($item);
         }
-        $divider = '<span class="divider">/</span>';
-        $list_items = '<li>'.join(" $divider</li><li>", $breadcrumbs).'</li>';
+        $list_items = '<li>'.join("</li><li>", $breadcrumbs).'</li>';
         $title = '<span class="accesshide">'.get_string('pagepath').'</span>';
         return $title . "<ul class=\"breadcrumb\">$list_items</ul>";
     }
@@ -108,7 +107,7 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
             }
         }
 
-        $content = '<ul class="nav">';
+        $content = '<ul class="nav navbar-nav">';
         foreach ($menu->get_children() as $item) {
             $content .= $this->render_custom_menu_item($item, 1);
         }

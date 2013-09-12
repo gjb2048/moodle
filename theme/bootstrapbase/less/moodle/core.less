@@ -23,19 +23,6 @@
     width:100%;
 }
 
-.fluid-span (@columns) {
-    width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
-    *width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%);
-}
-
-.empty-region-side-post.used-region-side-pre #region-main.span8 {
-    /** increase the span size by 1 **/
-    .fluid-span(9);
-}
-.empty-region-side-post.used-region-side-pre #block-region-side-pre.span4 {
-    /** decrease the span size by 1 **/
-    .fluid-span(3);
-}
 
 .empty-region-side-post #region-bs-main-and-post.span9 #region-main.span8 {
     /** RTL with no post area. **/
@@ -76,10 +63,10 @@ a.dimmed_text:visited,
 .usersuspended a:visited,
 .dimmed_category,
 .dimmed_category a {
-    .muted
+    .text-muted
 }
 .activity.label .dimmed_text {
-    .opacity(50)
+    .opacity(.5)
 }
 .unlist,
 .unlist li,
@@ -99,7 +86,7 @@ a.dimmed_text:visited,
     display: inline;
 }
 .notifytiny {
-    font-size: @fontSizeMini;
+    font-size: @font-size-mini;
 }
 .notifytiny li,
 .notifytiny td {
@@ -107,11 +94,11 @@ a.dimmed_text:visited,
 }
 .red,
 .notifyproblem {
-    color: @errorText;
+    color: @state-danger-text;
 }
 .green,
 .notifysuccess {
-    color: @successText;
+    color: @state-success-text;
 }
 .reportlink {
     text-align: right;
@@ -640,14 +627,14 @@ table.mod_index {
 * Completion progress report
 */
 .completion-expired {
-    background: @errorBackground;
+    background: @state-danger-bg;
 }
 .completion-expected {
-    font-size: @fontSizeMini;
+    font-size: @font-size-mini;
 }
 .completion-sortchoice,
 .completion-identifyfield {
-    font-size: @fontSizeMini;
+    font-size: @font-size-mini;
     vertical-align: bottom;
 }
 .completion-progresscell {
@@ -752,7 +739,7 @@ ul#tag-cloud-list li {
 }
 span.flagged-tag,
 span.flagged-tag a {
-    color: @errorText;
+    color: @state-danger-text;
 }
 table#tag-management-list {
     text-align: left;
@@ -1020,8 +1007,8 @@ body.tag .managelink {
     height: 18px;
     margin: 3px;
     text-align: center;
-    background-color: @successBackground;
-    border: 1px solid @successBorder;
+    background-color: @state-success-bg;
+    border: 1px solid @state-success-border;
 }
 .userenrolment .col_role .addrole img {
     vertical-align: baseline;
@@ -1406,7 +1393,7 @@ audio.mediaplugin_html5audio {
     margin-left: -3px;
     background-color: #fff;
     border: 1px solid #ccc;
-    .border-radius(10px);
+    border-radius: 10px;
     .box-shadow(5px 5px 20px 0 #666);
 }
 .moodle-dialogue-base .moodle-dialogue-wrap .moodle-dialogue-hd {
@@ -1418,7 +1405,7 @@ audio.mediaplugin_html5audio {
     color: #333;
     text-align: center;
     text-shadow: 1px 1px 1px #fff;
-    .border-radius(10px 10px 0 0);
+    .border-top-radius(10px 10px 0 0);
     border-bottom: 1px solid #bbb;
     background: #ccc;
     #gradient > .vertical(#fff, #ccc);
@@ -1501,11 +1488,11 @@ audio.mediaplugin_html5audio {
 }
 .moodle-dialogue-exception .param-stacktrace .stacktrace-file {
     color: navy;
-    font-size: @fontSizeSmall;
+    font-size: @font-size-small;
 }
 .moodle-dialogue-exception .param-stacktrace .stacktrace-line {
-    color: @errorText;
-    font-size: @fontSizeSmall;
+    color: @state-danger-text;
+    font-size: @font-size-small;
 }
 .moodle-dialogue-exception .param-stacktrace .stacktrace-call {
     color: #333;
@@ -1559,7 +1546,7 @@ audio.mediaplugin_html5audio {
     padding-bottom: 4px;
 }
 .moodle-dialogue .moodle-dialogue-bd .content-lightbox {
-    .opacity(75);
+    .opacity(.75);
     width: 100%;
     height: 100%;
     top: 0;
@@ -1697,7 +1684,7 @@ audio.mediaplugin_html5audio {
     left: 20.3em;
     margin: 0;
     padding: 1.6em;
-    background-color: @bodyBackground;
+    background-color: @body-bg;
     overflow-x: hidden;
     overflow-y: auto;
     line-height: 2em;
@@ -1714,7 +1701,7 @@ audio.mediaplugin_html5audio {
     display: block;
 }
 .choosercontainer #chooseform .selected {
-    background-color: @bodyBackground;
+    background-color: @body-bg;
     .box-shadow(0px 0 10px 0 #ccc);
 }
 .section-modchooser-link img.smallicon {
@@ -1737,7 +1724,7 @@ audio.mediaplugin_html5audio {
     padding: 1px 19px 14px;
     background-color: white;
     border: 1px solid #DDD;
-    .border-radius(4px);
+    border-radius: 4px;
 }
 .formlistingmore {
     position: absolute;
@@ -1750,12 +1737,12 @@ audio.mediaplugin_html5audio {
     background-color: whiteSmoke;
     border: 1px solid #ddd;
     color: #9DA0A4;
-    .border-radius(4px 0 4px 0);
+    .border-bottom-radius(4px);
 }
 .formlistingall {
     margin: 15px 0;
     padding: 0;
-    .border-radius(4px);
+    border-radius: 4px;
 }
 .formlistingrow {
     cursor: pointer;
@@ -1764,7 +1751,7 @@ audio.mediaplugin_html5audio {
     border-left: 1px solid #E1E1E8;
     border-right: 1px solid #E1E1E8;
     background-color: #F7F7F9;
-    .border-radius(0 0 4px 4px);
+    .border-bottom-radius(4px);
     padding: 6px;
     top: 50%;
     left: 50%;
@@ -1879,7 +1866,7 @@ div.badge .expireimage {
     top: 0px;
 }
 .expireimage {
-    .opacity(85);
+    .opacity(.85);
     width: 90px; height: 90px;
     left: 30px;
     top: 0px;
@@ -1890,10 +1877,10 @@ div.badge .expireimage {
     vertical-align: top;
 }
 .connected {
-    color: @successText;
+    color: @state-success-text;
 }
 .notconnected {
-    color: @errorText;
+    color: @state-danger-text;
 }
 #page-badges-award .recipienttable tr td {
     vertical-align: top;
@@ -1912,10 +1899,10 @@ div.badge .expireimage {
     margin-bottom: 0px;
 }
 .statusbox.active {
-    background-color: @successBackground;
+    background-color: @state-success-bg;
 }
 .statusbox.inactive {
-    background-color: @warningBackground;
+    background-color: @state-warning-bg;
 }
 .activatebadge {
     margin: 0px;
@@ -1996,17 +1983,17 @@ div.badge .expireimage {
         background-color: #fff;
         border: 1px solid #ccc;
         z-index:1000;
-        .border-radius(5px);
+        border-radius: 5px;
         .box-shadow(5px 5px 20px 0 #666);
 
         a {
             display: block;
-            color: @dropdownLinkColor;
+            color: @dropdown-link-color;
             padding:2px 1em 2px 0.5em;
             &:hover,
             &:focus {
-                color: @dropdownLinkColorHover;
-                background-color: @dropdownLinkBackgroundHover;
+                color: @dropdown-link-hover-color;
+                background-color: @dropdown-link-hover-bg;
             }
             &:first-child {
                 .border-top-radius(4px);

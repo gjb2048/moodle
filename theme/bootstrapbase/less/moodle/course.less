@@ -96,10 +96,10 @@
 }
 .editing .section .activity:hover,
 .editing .section .activity.action-menu-shown {
-    background-color: @grayLighter;
+    background-color: @gray-lighter;
 }
 .course-content .current {
-    background-color: @infoBackground;
+    background-color: @state-info-bg;
 }
 .course-content .section-summary {
     border: 1px solid #DDD;
@@ -113,8 +113,8 @@
     margin: 2px 5px 2px 5px;
 }
 .course-content .section-summary .section-summary-activities .activity-count {
-    .muted;
-    font-size: @fontSizeSmall;
+    .text-muted;
+    font-size: @font-size-small;
     margin: 3px;
     white-space: nowrap;
     display: inline-block;
@@ -165,7 +165,7 @@
     margin-top: 0;
 }
 .course-content ul li.section.hidden {
-    opacity: 0.5;
+    .opacity(0.5);
 }
 .course-content ul.topics li.section .content,
 .course-content ul.weeks li.section .content {
@@ -288,14 +288,14 @@ span.editinstructions {
     margin-top: -22px;
     margin-left: 30px;
     line-height: 16px;
-    font-size: @fontSizeSmall;
+    font-size: @font-size-small;
     padding: .1em .4em;
-    background-color: @infoBackground;
-    color: @infoText;
+    background-color: @state-info-bg;
+    color: @state-info-text;
     text-decoration: none;
     z-index: 9999;
     .box-shadow(2px 2px 5px 1px #ccc);
-    border: 1px solid @infoBorder;
+    border: 1px solid @state-info-border;
 }
 .dir-rtl span.editinstructions {
     left: auto;
@@ -307,10 +307,10 @@ span.editinstructions {
     width: 40%;
     margin: 0 30%;
     padding: 6px;
-    border: 1px solid @infoBorder;
+    border: 1px solid @state-info-border;
     text-align: center;
-    background: @infoBackground;
-    color: @infoText;
+    background: @state-info-bg;
+    color: @state-info-text;
     position: absolute;
     z-index: 9999;
     .box-shadow(2px 2px 5px 1px #ccc);
@@ -332,7 +332,7 @@ span.editinstructions {
     .progress;
 }
 .dndupload-progress-inner {
-    .progress .bar;
+    .progress-bar;
 }
 .dndupload-hidden {
     display: none;
@@ -374,7 +374,7 @@ span.editinstructions {
 .coursebox {
     margin-bottom: 15px;
     border: 1px dotted #ddd;
-    .border-radius(4px);
+    border-radius: 4px;
     padding: 5px;
 }
 
@@ -495,7 +495,7 @@ span.editinstructions {
 }
 
 .course_category_tree .category .numberofcourse {
-    font-size: @fontSizeSmall;
+    font-size: @font-size-small;
 }
 
 .course_category_tree .controls {
@@ -576,7 +576,7 @@ span.editinstructions {
 }
 
 .course_category_tree .paging.paging-morelink a {
-    font-size: @fontSizeSmall;
+    font-size: @font-size-small;
 }
 .dir-rtl .courses > .paging.paging-morelink,
 .dir-rtl .course_category_tree .paging.paging-morelink {
@@ -586,7 +586,7 @@ span.editinstructions {
 #page-course-index-category .generalbox.info {
     margin-bottom: 15px;
     border: 1px dotted #ddd;
-    .border-radius(4px);
+    border-radius: 4px;
     padding: 5px;
 }
 
