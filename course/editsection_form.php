@@ -228,6 +228,12 @@ class editsection_form extends moodleform {
 
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+
+        // Conditions: Don't let them provide names that are too long.
+        if (array_key_exists('name', $data) && (textlib::strlen($data['name']) > 255)) {
+            $errors['name_group'] = get_string('sectionnametoolong', 'moodle', 255);
+        }
+
         // Conditions: Don't let them set dates which make no sense
         if (array_key_exists('availablefrom', $data) &&
                 $data['availablefrom'] && $data['availableuntil'] &&

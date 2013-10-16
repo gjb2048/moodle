@@ -1480,6 +1480,7 @@ $string['secretalreadyused'] = 'Change password confirmation link was already us
 $string['secs'] = 'secs';
 $string['section'] = 'Section';
 $string['sectionname'] = 'Section name';
+$string['sectionnametoolong'] = 'The section name must be no longer than {$a} characters.';
 $string['sections'] = 'Sections';
 $string['sectionusedefaultname'] = 'Use default section name';
 $string['seealsostats'] = 'See also: stats';
