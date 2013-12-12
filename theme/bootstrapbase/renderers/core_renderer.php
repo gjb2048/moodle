@@ -106,11 +106,17 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
             foreach ($langs as $langtype => $langname) {
                 $language->add($langname, new moodle_url($this->page->url, array('lang' => $langtype)), $langname);
             }
+        } else {
+            $language = null;
         }
 
         $content = '<ul class="nav">';
         foreach ($menu->get_children() as $item) {
-            $content .= $this->render_custom_menu_item($item, 1);
+            if ($item === $language) {
+                $content .= $this->render_custom_menu_item($item, 1, ' langmenu');
+            } else {
+                $content .= $this->render_custom_menu_item($item, 1);
+            }
         }
 
         return $content.'</ul>';
@@ -120,7 +126,7 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
      * This code renders the custom menu items for the
      * bootstrap dropdown menu.
      */
-    protected function render_custom_menu_item(custom_menu_item $menunode, $level = 0 ) {
+    protected function render_custom_menu_item(custom_menu_item $menunode, $level = 0, $class = null) {
         static $submenucount = 0;
 
         if ($menunode->has_children()) {
@@ -131,7 +137,7 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
                 $dropdowntype = 'dropdown-submenu';
             }
 
-            $content = html_writer::start_tag('li', array('class'=>$dropdowntype));
+            $content = html_writer::start_tag('li', array('class'=>$dropdowntype.$class));
             // If the child has menus render it as a sub menu.
             $submenucount++;
             if ($menunode->get_url() !== null) {
@@ -147,7 +153,7 @@ class theme_bootstrapbase_core_renderer extends core_renderer {
             $content .= '</a>';
             $content .= '<ul class="dropdown-menu">';
             foreach ($menunode->get_children() as $menunode) {
-                $content .= $this->render_custom_menu_item($menunode, 0);
+                $content .= $this->render_custom_menu_item($menunode, 0, $class);
             }
             $content .= '</ul>';
         } else {
