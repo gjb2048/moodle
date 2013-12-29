@@ -651,7 +651,7 @@ class core_course_renderer extends plugin_renderer_base {
             if ($this->page->user_is_editing()) {
                 // When editing, the icon is just an image.
                 $completionpixicon = new pix_icon('i/completion-'.$completionicon, $imgalt, '',
-                        array('title' => $imgalt, 'class' => 'iconsmall'));
+                        array('title' => $imgalt, 'class' => 'icon-small'));
                 $output .= html_writer::tag('span', $this->output->render($completionpixicon),
                         array('class' => 'autocompletion'));
             } else if ($completion == COMPLETION_TRACKING_MANUAL) {

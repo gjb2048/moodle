@@ -85,18 +85,18 @@ if ($groupings = $DB->get_records('groupings', array('courseid'=>$course->id), '
 
         $url = new moodle_url('/group/grouping.php', array('id' => $grouping->id));
         $buttons  = html_writer::link($url, $OUTPUT->pix_icon('t/edit', $stredit, 'core',
-                array('class' => 'iconsmall')), array('title' => $stredit));
+                array('class' => 'icon-small')), array('title' => $stredit));
         if (empty($grouping->idnumber) || $canchangeidnumber) {
             // It's only possible to delete groups without an idnumber unless the user has the changeidnumber capability.
             $url = new moodle_url('/group/grouping.php', array('id' => $grouping->id, 'delete' => 1));
             $buttons .= html_writer::link($url, $OUTPUT->pix_icon('t/delete', $strdelete, 'core',
-                    array('class' => 'iconsmall')), array('title' => $strdelete));
+                    array('class' => 'icon-small')), array('title' => $strdelete));
         } else {
             $buttons .= $OUTPUT->spacer();
         }
         $url = new moodle_url('/group/assign.php', array('id' => $grouping->id));
         $buttons .= html_writer::link($url, $OUTPUT->pix_icon('t/groups', $strmanagegrping, 'core',
-                array('class' => 'iconsmall')), array('title' => $strmanagegrping));
+                array('class' => 'icon-small')), array('title' => $strmanagegrping));
 
         $line[3] = $buttons;
         $data[] = $line;

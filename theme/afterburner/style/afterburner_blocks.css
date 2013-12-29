@@ -131,7 +131,7 @@ Block
 .block .list .c1 {
     margin-left:5px;display:inline;
 }
-/** Bugfixes Smallicon & Navicon **/
+/** Bugfixes icon-small & Navicon **/
 .block_settings .block_tree li.item_with_icon > p img,
 .block_navigation .block_tree li.item_with_icon > p img {
     left:0;
@@ -139,9 +139,9 @@ Block
     top:0px !important;
     vertical-align:middle;
 }
-.block_settings .block_tree li.item_with_icon p img.smallicon,
+.block_settings .block_tree li.item_with_icon p img.icon-small,
 .block_settings .block_tree li.item_with_icon p img.navicon,
-.block_navigation .block_tree li.item_with_icon p img.smallicon,
+.block_navigation .block_tree li.item_with_icon p img.icon-small,
 .block_navigation .block_tree li.item_with_icon p img.navicon {
     margin: 0;
     padding: 0;
@@ -154,7 +154,7 @@ Block
 }
 /* COMMAND ICONS
 -----------------------*/
-img.iconsmall,
+img.icon-small,
 .block.block_with_controls div.header div.commands a img,
 .block-control-actions span.moodle-core-dragdrop-draghandle img,
 .course-content ul.topics li.section .right img,
@@ -169,7 +169,7 @@ img.iconsmall,
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
-.block.block_with_controls div.header div.commands img.iconsmall.actionmenu {
+.block.block_with_controls div.header div.commands img.icon-small.actionmenu {
     width: auto;
 }
 .course-content ul.topics li.section .right img.spacer,

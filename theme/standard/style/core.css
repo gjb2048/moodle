@@ -342,7 +342,7 @@ table#tag-management-list {margin: 10px auto;width: 80%;}
 .ie7 .tabtree .tabrow0 a span {padding: 10px 1em 10px 0;}
 .ie7 .tabtree .tabrow0 div {top: 2.6em;padding: 0.2em 0;}
 .ie7 .tabtree .tabrow0 div.empty {margin-right: 0;}
-.ie7.mod-quiz div.tabtree a span img.iconsmall {margin: 0;vertical-align: baseline;position: relative;top: 2px;}
+.ie7.mod-quiz div.tabtree a span img.icon-small {margin: 0;vertical-align: baseline;position: relative;top: 2px;}
 
 .ie6 .tabtree {height: 100%;}
 .ie6 .tabtree .tabrow0 {padding-top: 10px;}

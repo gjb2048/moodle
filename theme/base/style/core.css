@@ -102,7 +102,7 @@ img.resize {height: 1em;width: 1em;}
 /* Icon styles */
 img.icon {height:16px;vertical-align:text-bottom;width:16px;padding-right: 6px;}
 .dir-rtl img.icon {padding-left: 6px; padding-right: 0; }
-img.iconsmall {height:12px;margin-right:3px; margin-left: 3px;vertical-align:middle;width:12px;}
+img.icon-small {height:12px;margin-right:3px; margin-left: 3px;vertical-align:middle;width:12px;}
 img.iconhelp, .helplink img {height:16px; padding-left:3px;vertical-align:text-bottom;width:16px;}
 .dir-rtl img.iconhelp, .dir-rtl .helplink img {padding-right: 3px; padding-left: 0; }
 img.iconlarge {height: 24px; width: 24px; vertical-align:middle;}
@@ -136,8 +136,8 @@ img.emoticon {vertical-align: middle;width: 15px;height: 15px;}
 form.popupform,
 form.popupform div {display: inline;}
 .arrow_button input {overflow:hidden;}
-.action-icon img.smallicon { vertical-align: text-bottom; margin-left: .45em;}
-.dir-rtl .action-icon img.smallicon { margin-right: .45em; margin-left: 0;}
+.action-icon img.icon-small { vertical-align: text-bottom; margin-left: .45em;}
+.dir-rtl .action-icon img.icon-small { margin-right: .45em; margin-left: 0;}
 h1 img.icon,
 h1 img.iconhelp,
 h2 img.icon,
@@ -408,7 +408,7 @@ input#id_externalurl {direction:ltr;}
 .addbloglink {text-align: center;}
 .blog_entry .audience {text-align: right;padding-right: 4px;}
 .blog_entry .tags {margin-top: 15px;}
-.blog_entry .tags .action-icon img.smallicon { height: 16px; width: 16px; }
+.blog_entry .tags .action-icon img.icon-small { height: 16px; width: 16px; }
 .blog_entry .content {margin-left: 43px;}
 
 /**
@@ -456,7 +456,7 @@ input#id_externalurl {direction:ltr;}
 .loginbox .signupform {margin-top:1em;text-align:center;}
 .loginbox.twocolumns .loginpanel {float:left;width:49.5%;border-right: 1px solid;margin-bottom:-2000px;padding-bottom:2000px;}
 .loginbox.twocolumns .signuppanel {float:right;width:50%;margin-bottom:-2000px;padding-bottom:2000px;}
-.loginbox .potentialidp .smallicon { vertical-align: text-bottom; margin: 0 .3em; }
+.loginbox .potentialidp .icon-small { vertical-align: text-bottom; margin: 0 .3em; }
 
 /**
  * Notes
@@ -616,7 +616,7 @@ body.tag .managelink {padding: 5px;}
 #page-backup-restore .filealiasesfailures .aliaseslist {width:90%;margin:0.8em auto;background-color:white;border:1px dotted #666;}
 .path-backup .fitemtitle .iconlarge.icon-post { padding-left: 6px; }
 .path-backup.dir-rtl .fitemtitle .iconlarge.icon-post { padding-right: 6px; padding-right: 0; }
-.path-backup .fitem .smallicon { vertical-align: text-bottom; }
+.path-backup .fitem .icon-small { vertical-align: text-bottom; }
 .path-backup .wibbler { width: 500px; margin: 0 auto 10px; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 1px solid black; position: relative; min-height: 4px;}
 .path-backup .wibbler .wibble { position: absolute; left: 0; right: 0; top: 0; height: 4px; }
 .path-backup .wibbler .state0 { background: #eee; }
@@ -1352,8 +1352,8 @@ sup {vertical-align: super;}
     -webkit-box-shadow: 0px 0px 10px 0px #CCCCCC;
     -moz-box-shadow: 0px 0px 10px 0px #CCCCCC;
 }
-.section-modchooser-link img.smallicon { padding-right: 3px; }
-.dir-rtl .section-modchooser-link img.smallicon { padding-left: 3px; padding-right: 0;}
+.section-modchooser-link img.icon-small { padding-right: 3px; }
+.dir-rtl .section-modchooser-link img.icon-small { padding-left: 3px; padding-right: 0;}
 
 /* Install Process' text fields Forms, should always be justified to the left */
 form#installform #id_wwwroot,form#installform #id_dirroot ,form#installform #id_dataroot,
@@ -1544,7 +1544,7 @@ img#persona_signin { cursor: pointer; }
     margin-left: initial;
 }
 
-.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .iconsmall {
+.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .icon-small {
     margin: 8px 4px 0px 2px;
 }
 
@@ -1586,7 +1586,7 @@ img#persona_signin { cursor: pointer; }
 
 .dir-rtl .block .moodle-actionmenu {text-align: right;}
 .dir-rtl .moodle-actionmenu[data-enhanced].show .menu {text-align: right;right: auto;left: 0;}
-.dir-rtl .moodle-actionmenu[data-enhanced].show .menu .iconsmall {margin-right: 0;margin-left: 8px;}
+.dir-rtl .moodle-actionmenu[data-enhanced].show .menu .icon-small {margin-right: 0;margin-left: 8px;}
 
 .jsenabled .moodle-actionmenu[data-enhanced] .menu.align-tl-bl {top: 100%;left: 0;margin-top: 4px;}
 .jsenabled .moodle-actionmenu[data-enhanced] .menu.align-tr-bl {top: 100%;right: 100%;}

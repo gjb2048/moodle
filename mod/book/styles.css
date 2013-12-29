@@ -38,7 +38,7 @@
 }
 .path-mod-book .block_book_toc .action-list { float: right; }
 .dir-rtl.path-mod-book .block_book_toc .action-list { float: left; }
-.path-mod-book .block_book_toc .action-list img.smallicon {
+.path-mod-book .block_book_toc .action-list img.icon-small {
     margin: 0 3px;
 }
 
