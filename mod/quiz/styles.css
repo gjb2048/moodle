@@ -1215,7 +1215,7 @@ bank window's title is prominent enough*/
 .ie6#page-mod-quiz-edit #categoryquestions .questiontext {
     /*ie6 shows this as an arrow if this is not specified*/cursor: pointer;
 }
-.ie6.path-mod-quiz div.tabtree a span img.iconsmall {
+.ie6.path-mod-quiz div.tabtree a span img.icon-small {
     margin: 0;
     vertical-align: baseline;
     position: relative;

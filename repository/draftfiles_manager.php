@@ -297,7 +297,7 @@ default:
                 $drafturl = $file->url;
                 // a file
                 echo '<li>';
-                echo $OUTPUT->pix_icon(file_file_icon($file), '', 'moodle', array('class' => 'iconsmall'));
+                echo $OUTPUT->pix_icon(file_file_icon($file), '', 'moodle', array('class' => 'icon-small'));
                 echo html_writer::link($drafturl, $file->filename);
 
                 $home_url->param('filename', $file->filename);
@@ -322,7 +322,7 @@ default:
             } else {
                 // a folder
                 echo '<li>';
-                echo '<img src="'.$OUTPUT->pix_url(file_folder_icon()) . '" class="iconsmall" />';
+                echo '<img src="'.$OUTPUT->pix_url(file_folder_icon()) . '" class="icon-small" />';
 
                 $home_url->param('action', 'browse');
                 $home_url->param('draftpath', $file->filepath);

@@ -1444,7 +1444,7 @@ function message_contact_link($userid, $linktype='add', $return=false, $script=n
                 $iconpath = 't/addcontact';
         }
 
-        $img = '<img src="'.$OUTPUT->pix_url($iconpath).'" class="iconsmall" alt="'.$safealttext.'" />';
+        $img = '<img src="'.$OUTPUT->pix_url($iconpath).'" class="icon-small" alt="'.$safealttext.'" />';
     }
 
     $output = '<span class="'.$linktype.'contact">'.
@@ -1488,9 +1488,9 @@ function message_history_link($userid1, $userid2, $return=false, $keywords='', $
     }
 
     if ($linktext == 'icon') {  // Icon only
-        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="iconsmall" alt="'.$strmessagehistory.'" />';
+        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="icon-small" alt="'.$strmessagehistory.'" />';
     } else if ($linktext == 'both') {  // Icon and standard name
-        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="iconsmall" alt="" />';
+        $fulllink = '<img src="'.$OUTPUT->pix_url('t/messages') . '" class="icon-small" alt="" />';
         $fulllink .= '&nbsp;'.$strmessagehistory;
     } else if ($linktext) {    // Custom name
         $fulllink = $linktext;

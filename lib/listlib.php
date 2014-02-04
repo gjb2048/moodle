@@ -595,12 +595,12 @@ abstract class list_item {
     public function image_icon($action, $url, $icon) {
         global $OUTPUT;
         return '<a title="' . s($action) .'" href="'.$url.'">
-                <img src="' . $OUTPUT->pix_url('t/'.$icon) . '" class="iconsmall" alt="' . s($action). '" /></a> ';
+                <img src="' . $OUTPUT->pix_url('t/'.$icon) . '" class="icon-small" alt="' . s($action). '" /></a> ';
     }
 
     public function image_spacer() {
         global $OUTPUT;
-        return '<img src="' . $OUTPUT->pix_url('spacer') . '" class="iconsmall" alt="" />';
+        return '<img src="' . $OUTPUT->pix_url('spacer') . '" class="icon-small" alt="" />';
     }
 
     /**

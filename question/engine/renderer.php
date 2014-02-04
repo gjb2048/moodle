@@ -329,7 +329,7 @@ class core_question_renderer extends plugin_renderer_base {
         $editurl = new moodle_url('/question/question.php', $params);
 
         return html_writer::tag('div', html_writer::link(
-                $editurl, $this->pix_icon('t/edit', get_string('edit'), '', array('class' => 'iconsmall')) .
+                $editurl, $this->pix_icon('t/edit', get_string('edit'), '', array('class' => 'icon-small')) .
                 get_string('editquestion', 'question')),
                 array('class' => 'editquestion'));
     }
