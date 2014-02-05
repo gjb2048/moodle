@@ -264,13 +264,13 @@ abstract class base_moodleform extends moodleform {
             $this->add_html_formatting($setting);
             switch ($setting->get_status()) {
                 case backup_setting::LOCKED_BY_PERMISSION:
-                    $icon = ' '.$OUTPUT->pix_icon('i/permissionlock', get_string('lockedbypermission', 'backup'), 'moodle', array('class'=>'smallicon lockedicon permissionlock'));
+                    $icon = ' '.$OUTPUT->pix_icon('i/permissionlock', get_string('lockedbypermission', 'backup'), 'moodle', array('class'=>'icon-small lockedicon permissionlock'));
                     break;
                 case backup_setting::LOCKED_BY_CONFIG:
-                    $icon = ' '.$OUTPUT->pix_icon('i/configlock', get_string('lockedbyconfig', 'backup'), 'moodle', array('class'=>'smallicon lockedicon configlock'));
+                    $icon = ' '.$OUTPUT->pix_icon('i/configlock', get_string('lockedbyconfig', 'backup'), 'moodle', array('class'=>'icon-small lockedicon configlock'));
                     break;
                 case backup_setting::LOCKED_BY_HIERARCHY:
-                    $icon = ' '.$OUTPUT->pix_icon('i/hierarchylock', get_string('lockedbyhierarchy', 'backup'), 'moodle', array('class'=>'smallicon lockedicon configlock'));
+                    $icon = ' '.$OUTPUT->pix_icon('i/hierarchylock', get_string('lockedbyhierarchy', 'backup'), 'moodle', array('class'=>'icon-small lockedicon configlock'));
                     break;
                 default:
                     $icon = '';

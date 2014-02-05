@@ -142,15 +142,13 @@
     display: block;
 }
 .section .activity .moodle-actionmenu[data-enhanced] .menu {margin-left: -2.8em;}
-.section img.iconsmall {
+.section img.icon-small {
     vertical-align: text-bottom;
     width: 16px;
     height: 16px;
     margin: 4px;
 }
-.section .editing_title img.iconsmall {
-    width: 12px;
-    height: 12px;
+.section .editing_title img.icon-small {
     margin: 4px 8px 4px 0;
 }
 
@@ -250,7 +248,7 @@ li.section.hidden span.commands a.editing_show {cursor:default;}
 .coursebox .enrolmenticons {padding:3px 0;float:right;}
 .coursebox .moreinfo {padding:3px 0;float:right;}
 .coursebox .enrolmenticons img,
-.coursebox .moreinfo img {margin:0 .2em;}
+.coursebox .moreinfo img {margin:0 .2em;height: 16px;width: 16px;}
 .coursebox .content {clear:both;overflow: hidden;}
 .coursebox .content .summary,
 .coursebox .content .coursecat {float:right;width: 55%;}
@@ -390,7 +388,7 @@ input.titleeditor { vertical-align: text-bottom; }
 #course-category-listings .listing-actions > .moodle-actionmenu {display:inline-block;}
 .coursecat-management-header .moodle-actionmenu[data-enhanced].show .menu a,
 #course-category-listings .listing-actions > .moodle-actionmenu .menu a {padding: 4px 1em;}
-#course-category-listings .listing-actions .iconsmall {margin-left:0.5em;}
+#course-category-listings .listing-actions .icon-small {margin-left:0.5em;}
 #course-category-listings ul.ml {list-style: none;margin:1em 0;}
 #course-category-listings ul.ml ul.ml {margin:0;}
 #course-category-listings li {line-height:2.2em;}
@@ -461,7 +459,7 @@ input.titleeditor { vertical-align: text-bottom; }
 
 #category-listing .course-count {color:#a1a1a8;margin-right:2em;min-width:3.5em;display:inline-block;}
 #category-listing .listitem.collapsed > ul.ml {display: none;}
-#category-listing .course-count .smallicon {width:0.8em;height:0.8em;margin:0 0.3em;}
+#category-listing .course-count .icon-small {width:0.8em;height:0.8em;margin:0 0.3em;}
 
 #category-listing .listitem > div > .ba-checkbox {vertical-align:middle;width:2.2em;text-align:center;margin:-1px 0;padding-top:2px;margin-right:0.5em;}
 .dir-rtl #category-listing .listitem > div > .ba-checkbox {margin-left:0.5em;margin-right:0.5em;}

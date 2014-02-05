@@ -71,7 +71,7 @@
         .actions {
             position: absolute;
             right: 0;
-            top: 0;
+            bottom: 0;
         }
 
         .contentwithoutlink,
@@ -105,8 +105,8 @@
     }
 
     .filler {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
         padding: 0.3em;
         display: inline-block;
     }
@@ -769,44 +769,26 @@ span.editinstructions {
 }
 
 .section {
-    .summary,
-    .activity {
-        .iconsmall {
-            width: 16px;
-            height: 16px;
-        }
-    }
+
     .editing_title {
-        .iconsmall {
-            width: 12px;
-            height: 12px;
+        .icon-small {
             margin: 8px 8px 0px 0;
             padding: 4px 8px 0px 0;
             vertical-align: text-bottom;
         }
     }
     .moodle-actionmenu {
-        .iconsmall {
+        .icon-small {
             max-width: none !important; /** reset sets 100% !important which breaks on IE8 without this !important */
-            width:16px;
-            height:16px;
-            padding: 4px;
+            padding: 4px 4px 0px;
             vertical-align: text-bottom;
-        }
-    }
-    .moodle-actionmenu[data-enhanced] {
-        .menu {
-            img {
-              width: 12px;
-              height: 12px;
-            }
         }
     }
 }
 
 .dir-rtl .section {
     .editing_title {
-        .iconsmall {
+        .icon-small {
             margin: 8px 0 0 8px;
             padding: 4px 0 0 8px;
         }
@@ -1080,8 +1062,7 @@ span.editinstructions {
             margin-right:2rem;
             min-width:3.5em;
             display:inline-block;
-            .smallicon {
-                width:12px;
+            .icon-small {
                 margin-left:4px;
                 vertical-align: inherit;
             }

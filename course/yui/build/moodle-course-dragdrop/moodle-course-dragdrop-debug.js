@@ -13,7 +13,7 @@ var CSS = {
     CONTENT: 'content',
     COURSECONTENT: 'course-content',
     EDITINGMOVE: 'editing_move',
-    ICONCLASS: 'iconsmall',
+    ICONCLASS: 'icon-small',
     JUMPMENU: 'jumpmenu',
     LEFT: 'left',
     LIGHTBOX: 'lightbox',
@@ -384,7 +384,7 @@ Y.extend(DRAGRESOURCE, M.core.dragdrop, {
         // Get our drag object
         var drag = e.target;
         drag.get('dragNode').setContent(drag.get('node').get('innerHTML'));
-        drag.get('dragNode').all('img.iconsmall').setStyle('vertical-align', 'baseline');
+        drag.get('dragNode').all('img.icon-small').setStyle('vertical-align', 'baseline');
     },
 
     drag_dropmiss: function(e) {

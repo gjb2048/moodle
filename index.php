@@ -142,7 +142,7 @@
                 $streditsummary = get_string('editsummary');
                 echo "<a title=\"$streditsummary\" ".
                      " href=\"course/editsection.php?id=$section->id\"><img src=\"" . $OUTPUT->pix_url('t/edit') . "\" ".
-                     " class=\"iconsmall\" alt=\"$streditsummary\" /></a><br /><br />";
+                     " class=\"icon-small\" alt=\"$streditsummary\" /></a><br /><br />";
             }
 
             $courserenderer = $PAGE->get_renderer('core', 'course');

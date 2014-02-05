@@ -115,12 +115,12 @@ class enrol_manual_plugin extends enrol_plugin {
 
         if (has_capability('enrol/manual:enrol', $context) or has_capability('enrol/manual:unenrol', $context)) {
             $managelink = new moodle_url("/enrol/manual/manage.php", array('enrolid'=>$instance->id));
-            $icons[] = $OUTPUT->action_icon($managelink, new pix_icon('t/enrolusers', get_string('enrolusers', 'enrol_manual'), 'core', array('class'=>'iconsmall')));
+            $icons[] = $OUTPUT->action_icon($managelink, new pix_icon('t/enrolusers', get_string('enrolusers', 'enrol_manual'), 'core', array('class'=>'icon-small')));
         }
         if (has_capability('enrol/manual:config', $context)) {
             $editlink = new moodle_url("/enrol/manual/edit.php", array('courseid'=>$instance->courseid));
             $icons[] = $OUTPUT->action_icon($editlink, new pix_icon('t/edit', get_string('edit'), 'core',
-                    array('class' => 'iconsmall')));
+                    array('class' => 'icon-small')));
         }
 
         return $icons;

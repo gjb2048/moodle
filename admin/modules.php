@@ -130,11 +130,11 @@
             $class   = '';
         } else if ($module->visible) {
             $visible = "<a href=\"modules.php?hide=$module->name&amp;sesskey=".sesskey()."\" title=\"$strhide\">".
-                       "<img src=\"" . $OUTPUT->pix_url('t/hide') . "\" class=\"iconsmall\" alt=\"$strhide\" /></a>";
+                       "<img src=\"" . $OUTPUT->pix_url('t/hide') . "\" class=\"icon-small\" alt=\"$strhide\" /></a>";
             $class   = '';
         } else {
             $visible = "<a href=\"modules.php?show=$module->name&amp;sesskey=".sesskey()."\" title=\"$strshow\">".
-                       "<img src=\"" . $OUTPUT->pix_url('t/show') . "\" class=\"iconsmall\" alt=\"$strshow\" /></a>";
+                       "<img src=\"" . $OUTPUT->pix_url('t/show') . "\" class=\"icon-small\" alt=\"$strshow\" /></a>";
             $class =   'dimmed_text';
         }
         if ($module->name == "forum") {

@@ -1040,7 +1040,7 @@ class block_manager {
             $str = new lang_string('moveblock', 'block', $blocktitle);
             $controls[] = new action_menu_link_primary(
                 new moodle_url($actionurl, array('bui_moveid' => $block->instance->id)),
-                new pix_icon('t/move', $str, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                new pix_icon('t/move', $str, 'moodle', array('class' => 'icon-small', 'title' => '')),
                 $str,
                 array('class' => 'editing_move')
             );
@@ -1052,7 +1052,7 @@ class block_manager {
             $str = new lang_string('configureblock', 'block', $blocktitle);
             $controls[] = new action_menu_link_secondary(
                 new moodle_url($actionurl, array('bui_editid' => $block->instance->id)),
-                new pix_icon('t/edit', $str, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                new pix_icon('t/edit', $str, 'moodle', array('class' => 'icon-small', 'title' => '')),
                 $str,
                 array('class' => 'editing_edit')
             );
@@ -1064,12 +1064,12 @@ class block_manager {
             if ($block->instance->visible) {
                 $str = new lang_string('hideblock', 'block', $blocktitle);
                 $url = new moodle_url($actionurl, array('bui_hideid' => $block->instance->id));
-                $icon = new pix_icon('t/hide', $str, 'moodle', array('class' => 'iconsmall', 'title' => ''));
+                $icon = new pix_icon('t/hide', $str, 'moodle', array('class' => 'icon-small', 'title' => ''));
                 $attributes = array('class' => 'editing_hide');
             } else {
                 $str = new lang_string('showblock', 'block', $blocktitle);
                 $url = new moodle_url($actionurl, array('bui_showid' => $block->instance->id));
-                $icon = new pix_icon('t/show', $str, 'moodle', array('class' => 'iconsmall', 'title' => ''));
+                $icon = new pix_icon('t/show', $str, 'moodle', array('class' => 'icon-small', 'title' => ''));
                 $attributes = array('class' => 'editing_show');
             }
             $controls[] = new action_menu_link_secondary($url, $icon, $str, $attributes);
@@ -1089,7 +1089,7 @@ class block_manager {
             $str = new lang_string('assignrolesinblock', 'block', $blocktitle);
             $controls[] = new action_menu_link_secondary(
                 $rolesurl,
-                new pix_icon('t/assignroles', $str, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                new pix_icon('t/assignroles', $str, 'moodle', array('class' => 'icon-small', 'title' => '')),
                 $str,
                 array('class' => 'editing_roles')
             );
@@ -1100,7 +1100,7 @@ class block_manager {
             $str = new lang_string('deleteblock', 'block', $blocktitle);
             $controls[] = new action_menu_link_secondary(
                 new moodle_url($actionurl, array('bui_deleteid' => $block->instance->id)),
-                new pix_icon('t/delete', $str, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                new pix_icon('t/delete', $str, 'moodle', array('class' => 'icon-small', 'title' => '')),
                 $str,
                 array('class' => 'editing_delete')
             );

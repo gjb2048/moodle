@@ -195,7 +195,7 @@ foreach ($sortedbehaviours as $behaviour => $behaviourname) {
             $rowclass = 'dimmed_text';
         }
     } else {
-        $icons = $OUTPUT->spacer(array('class' => 'iconsmall'));
+        $icons = $OUTPUT->spacer(array('class' => 'icon-small'));
     }
 
     // Move icons.
@@ -235,7 +235,7 @@ function question_behaviour_icon_html($action, $behaviour, $icon, $alt, $tip) {
     global $OUTPUT;
     return $OUTPUT->action_icon(new moodle_url('/admin/qbehaviours.php',
             array($action => $behaviour, 'sesskey' => sesskey())),
-            new pix_icon($icon, $alt, 'moodle', array('title' => '', 'class' => 'iconsmall')),
+            new pix_icon($icon, $alt, 'moodle', array('title' => '', 'class' => 'icon-small')),
             null, array('title' => $tip));
 }
 

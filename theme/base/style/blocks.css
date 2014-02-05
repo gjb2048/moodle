@@ -5,7 +5,6 @@
 .block .header .block_action input {margin:0 3px; width: 12px; height: 12px;}
 .block .header .commands { text-align: right; clear: both;}
 .block .header .commands > a { margin:0 3px; }
-.block .header .commands .icon img {width:12px;height:12px;}
 .block .header .commands img.actionmenu {width:auto;}
 .block .content {padding:4px;}
 .jsenabled .block.hidden .content {display: none;}

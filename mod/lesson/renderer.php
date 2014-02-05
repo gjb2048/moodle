@@ -398,16 +398,16 @@ class mod_lesson_renderer extends plugin_renderer_base {
 
         if ($printmove) {
             $printmovehtml = new moodle_url('/mod/lesson/lesson.php', array('id'=>$this->page->cm->id, 'action'=>'move', 'pageid'=>$page->id, 'sesskey'=>sesskey()));
-            $actions[] = html_writer::link($printmovehtml, '<img src="'.$this->output->pix_url('t/move').'" class="iconsmall" alt="'.get_string('move').'" />');
+            $actions[] = html_writer::link($printmovehtml, '<img src="'.$this->output->pix_url('t/move').'" class="icon-small" alt="'.get_string('move').'" />');
         }
         $url = new moodle_url('/mod/lesson/editpage.php', array('id'=>$this->page->cm->id, 'pageid'=>$page->id, 'edit'=>1));
-        $actions[] = html_writer::link($url, '<img src="'.$this->output->pix_url('t/edit').'" class="iconsmall" alt="'.get_string('update').'" />');
+        $actions[] = html_writer::link($url, '<img src="'.$this->output->pix_url('t/edit').'" class="icon-small" alt="'.get_string('update').'" />');
 
         $url = new moodle_url('/mod/lesson/view.php', array('id'=>$this->page->cm->id, 'pageid'=>$page->id));
-        $actions[] = html_writer::link($url, '<img src="'.$this->output->pix_url('t/preview').'" class="iconsmall" alt="'.get_string('preview').'" />');
+        $actions[] = html_writer::link($url, '<img src="'.$this->output->pix_url('t/preview').'" class="icon-small" alt="'.get_string('preview').'" />');
 
         $url = new moodle_url('/mod/lesson/lesson.php', array('id'=>$this->page->cm->id, 'action'=>'confirmdelete', 'pageid'=>$page->id, 'sesskey'=>sesskey()));
-        $actions[] = html_writer::link($url, '<img src="'.$this->output->pix_url('t/delete').'" class="iconsmall" alt="'.get_string('delete').'" />');
+        $actions[] = html_writer::link($url, '<img src="'.$this->output->pix_url('t/delete').'" class="icon-small" alt="'.get_string('delete').'" />');
 
         if ($printaddpage) {
             $options = array();

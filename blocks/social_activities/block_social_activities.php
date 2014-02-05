@@ -80,7 +80,7 @@ class block_social_activities extends block_list {
         $editbuttons = '';
 
         if ($ismoving) {
-            $this->content->icons[] = '&nbsp;<img align="bottom" src="'.$OUTPUT->pix_url('t/move') . '" class="iconsmall" alt="" />';
+            $this->content->icons[] = '&nbsp;<img align="bottom" src="'.$OUTPUT->pix_url('t/move') . '" class="icon-small" alt="" />';
             $this->content->items[] = $USER->activitycopyname.'&nbsp;(<a href="'.$CFG->wwwroot.'/course/mod.php?cancelcopy=true&amp;sesskey='.sesskey().'">'.$strcancel.'</a>)';
         }
 
@@ -97,7 +97,7 @@ class block_social_activities extends block_list {
                     // Prepend list of actions with the 'move' action.
                     $actions = array('move' => new action_menu_link_primary(
                         new moodle_url('/course/mod.php', array('sesskey' => sesskey(), 'copy' => $mod->id)),
-                        new pix_icon('t/move', $strmove, 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                        new pix_icon('t/move', $strmove, 'moodle', array('class' => 'icon-small', 'title' => '')),
                         $strmove
                     )) + $actions;
 

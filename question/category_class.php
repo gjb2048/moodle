@@ -117,7 +117,7 @@ class question_category_list_item extends list_item {
             $deleteurl = new moodle_url($this->parentlist->pageurl, array('delete' => $this->id, 'sesskey' => sesskey()));
             $item .= html_writer::link($deleteurl,
                     html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('t/delete'),
-                            'class' => 'iconsmall', 'alt' => $str->delete)),
+                            'class' => 'icon-small', 'alt' => $str->delete)),
                     array('title' => $str->delete));
         }
 

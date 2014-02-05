@@ -514,7 +514,7 @@ class core_course_renderer extends plugin_renderer_base {
             // The module chooser link
             $modchooser = html_writer::start_tag('div', array('class' => 'mdl-right'));
             $modchooser.= html_writer::start_tag('div', array('class' => 'section-modchooser'));
-            $icon = $this->output->pix_icon('t/add', '');
+            $icon = $this->output->pix_icon('t/add', '', 'moodle', array('class' => 'icon-small'));
             $span = html_writer::tag('span', $straddeither, array('class' => 'section-modchooser-text'));
             $modchooser .= html_writer::tag('span', $icon . $span, array('class' => 'section-modchooser-link'));
             $modchooser.= html_writer::end_tag('div');
@@ -649,7 +649,7 @@ class core_course_renderer extends plugin_renderer_base {
             if ($this->page->user_is_editing()) {
                 // When editing, the icon is just an image.
                 $completionpixicon = new pix_icon('i/completion-'.$completionicon, $imgalt, '',
-                        array('title' => $imgalt, 'class' => 'iconsmall'));
+                        array('title' => $imgalt, 'class' => 'icon-small'));
                 $output .= html_writer::tag('span', $this->output->render($completionpixicon),
                         array('class' => 'autocompletion'));
             } else if ($completion == COMPLETION_TRACKING_MANUAL) {

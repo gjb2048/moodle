@@ -7,7 +7,7 @@
 .path-grade-edit-tree ul#grade_tree {width: auto;}
 .path-grade-edit-tree ul#grade_tree li {list-style: none;}
 .path-grade-edit-tree ul#grade_tree li.category {margin-bottom: 6px;}
-.path-grade-edit-tree .iconsmall {margin-left: 4px;}
+.path-grade-edit-tree .icon-small {margin-left: 4px;}
 
 #grade-report-toggles {text-align: center;}
 #grade-aggregation-help dt {margin-top: 15px;}
@@ -25,7 +25,7 @@
 .gradetreebox td.range {white-space: nowrap;}
 .gradetreebox span.actionlink {color: blue;}
 .gradetreebox span.actionlink:hover {text-decoration: underline;cursor: pointer;}
-.gradetreebox img.iconsmall {margin-left: 4px;}
+.gradetreebox img.icon-small {margin-left: 4px;}
 .gradetreebox img.icon {margin-right: 5px;}
 .gradetreebox #gradetreesubmit {margin-bottom:1em;text-align: center;}
 .gradetreebox .hidden {display: none;}

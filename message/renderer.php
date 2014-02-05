@@ -75,7 +75,7 @@ class core_message_renderer extends plugin_renderer_base {
                 $url = new moodle_url('/admin/message.php', array('disable' => $processor->id, 'sesskey' => sesskey()));
                 $enable->text = html_writer::link($url, html_writer::empty_tag('img',
                     array('src'   => $this->output->pix_url('t/hide'),
-                          'class' => 'iconsmall',
+                          'class' => 'icon-small',
                           'title' => get_string('outputenabled', 'message'),
                           'alt'   => get_string('outputenabled', 'message'),
                     )
@@ -85,7 +85,7 @@ class core_message_renderer extends plugin_renderer_base {
                 $url = new moodle_url('/admin/message.php', array('enable' => $processor->id, 'sesskey' => sesskey()));
                 $enable->text = html_writer::link($url, html_writer::empty_tag('img',
                     array('src'   => $this->output->pix_url('t/show'),
-                          'class' => 'iconsmall',
+                          'class' => 'icon-small',
                           'title' => get_string('outputdisabled', 'message'),
                           'alt'   => get_string('outputdisabled', 'message'),
                     )
