@@ -220,12 +220,23 @@ img.icon {
     padding-left: 6px;
     padding-right: 0;
 }
-img.iconsmall {
-    height: 12px;
-    margin-right: 3px;
-    vertical-align: middle;
+
+// Make them more finger friendly.
+.icon-small {
     width: 12px;
+    height: 12px; 
 }
+
+img.icon-small {
+    margin: 0;
+    padding: 0.3em;
+    vertical-align: middle;
+    line-height: inherit;
+    background-image: inherit;
+    background-position: inherit;
+    background-repeat: inherit;
+}
+
 img.iconhelp, .helplink img {
     height: 16px;
     padding-left: 3px;
@@ -330,7 +341,7 @@ form.popupform div {
 .arrow_button input {
     overflow: hidden;
 }
-.action-icon img.smallicon {
+.action-icon img.icon-small {
     vertical-align: text-bottom;
     margin: 0 0.3em;
 }
@@ -394,7 +405,7 @@ a.skip:active {
 .blog_entry .tags {
     margin-top: 15px;
 }
-.blog_entry .tags .action-icon img.smallicon {
+.blog_entry .tags .action-icon img.icon-small {
     height: 16px;
     width: 16px;
 }
@@ -537,6 +548,7 @@ a.skip:active {
     margin-bottom: -2000px;
     padding-bottom: 2000px;
 }
+
 .dir-rtl {
     .loginbox.twocolumns .loginpanel,
     .loginbox.twocolumns .signuppanel {
@@ -544,7 +556,7 @@ a.skip:active {
     }
 }
 
-.loginbox .potentialidp .smallicon {
+.loginbox .potentialidp .icon-small {
     vertical-align: text-bottom;
     margin: 0 .3em;
 }
@@ -1078,7 +1090,7 @@ body.tag .managelink {
     margin: 3px;
     > *:hover {
         border-bottom:1px solid #666;
-    }
+}
 }
 .userenrolment .col_role .addrole img,
 .userenrolment .col_group .addgroup img {
@@ -1104,15 +1116,15 @@ body.tag .managelink {
 }
 #page-enrol-users {
     .enrol_user_buttons {
-        float: right;
+    float: right;
         .enrolusersbutton {
             display: inline;
             div,
             form {
                 display: inline;
                 margin-right: 0;
-            }
-        }
+}
+}
     }
     #filterform {
         .well;
@@ -1124,15 +1136,15 @@ body.tag .managelink {
             margin-right: .3em;
             white-space: nowrap;
             label {
-                display: inline;
+    display: inline;
                 line-height: @baseLineHeight;
                 padding-right: .3em;
-            }
+}
             :before,
             :after {
-                display: inline;
-            }
-        }
+    display: inline;
+}
+}
         div,
         fieldset {
             display: inline;
@@ -1140,7 +1152,7 @@ body.tag .managelink {
             clear: none;
             width: auto;
             margin: 0;
-        }
+}
         select,
         .ftext input {
             width: 7em;
@@ -1151,8 +1163,8 @@ body.tag .managelink {
         }
     }
     .user-enroller-panel .uep-search-results .user .details {
-       width: 237px;
-    }
+    width: 237px;
+}
 }
 .dir-rtl {
     &#page-enrol-users {
@@ -1794,7 +1806,7 @@ body#page-lib-editor-tinymce-plugins-moodlemedia-preview {
     background-color: @bodyBackground;
     .box-shadow(0px 0 10px 0 #ccc);
 }
-.section-modchooser-link img.smallicon {
+.section-modchooser-link img.icon-small {
     padding: 3px;
 }
 /* Form element: listing */
@@ -2071,7 +2083,7 @@ img#persona_signin {
             padding-left: 4px;
             padding-right: 4px;
 
-            .iconsmall {
+            .icon-small {
                 margin: 4px 4px 4px 0px;
                 padding: 8px 4px 0px 2px;
                 vertical-align: text-bottom;
@@ -2148,7 +2160,7 @@ img#persona_signin {
         img {
             vertical-align: middle;
         }
-        .iconsmall {
+        .icon-small {
             margin: 4px 4px 4px -24px;
         }
         > li {
@@ -2188,7 +2200,7 @@ img#persona_signin {
             text-align: right;
             left: 0;
             right: auto;
-            .iconsmall {
+            .icon-small {
                 margin-right:0;
                 margin-left:8px;
             }
@@ -2222,11 +2234,6 @@ img#persona_signin {
 
 ul.dragdrop-keyboard-drag li {
     list-style-type: none;
-}
-
-.block-control-actions .moodle-core-dragdrop-draghandle img {
-    width: 12px;
-    height: 12px;
 }
 
 a.disabled:hover,

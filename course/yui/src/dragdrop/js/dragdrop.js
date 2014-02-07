@@ -11,7 +11,7 @@ var CSS = {
     CONTENT: 'content',
     COURSECONTENT: 'course-content',
     EDITINGMOVE: 'editing_move',
-    ICONCLASS: 'iconsmall',
+    ICONCLASS: 'icon-small',
     JUMPMENU: 'jumpmenu',
     LEFT: 'left',
     LIGHTBOX: 'lightbox',

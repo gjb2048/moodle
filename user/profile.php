@@ -341,7 +341,7 @@ if ($user->skype && !isset($hiddenfields['skypeid'])) {
 if ($user->yahoo && !isset($hiddenfields['yahooid'])) {
     $imurl = new moodle_url('http://edit.yahoo.com/config/send_webmesg', array('.target'=>$user->yahoo, '.src'=>'pg'));
     $iconurl = new moodle_url('http://opi.yahoo.com/online', array('u'=>$user->yahoo, 'm'=>'g', 't'=>'0'));
-    $statusicon = html_writer::tag('img', '', array('src'=>$iconurl, 'class'=>'iconsmall icon-post', 'alt'=>get_string('status')));
+    $statusicon = html_writer::tag('img', '', array('src'=>$iconurl, 'class'=>'icon-small icon-post', 'alt'=>get_string('status')));
     echo html_writer::tag('dt', get_string('yahooid'));
     echo html_writer::tag('dd', html_writer::link($imurl, s($user->yahoo) . $statusicon));
 }

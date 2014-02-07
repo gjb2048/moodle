@@ -419,7 +419,7 @@ tab styles for ie6 & ie7
 .ie7 .tabtree .tabrow0 div.empty {
     margin-right: 0;
 }
-.ie7.mod-quiz div.tabtree a span img.iconsmall {
+.ie7.mod-quiz div.tabtree a span img.icon-small {
     margin: 0;
     vertical-align: baseline;
     position: relative;
@@ -481,6 +481,6 @@ tab styles for ie6 & ie7
 
 /* Actionmenu
 -------------*/
-.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .iconsmall {
+.jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .icon-small {
     margin: 4px 4px 4px 2px;
 }

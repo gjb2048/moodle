@@ -672,8 +672,8 @@ class page_wiki_comments extends page_wiki {
 
             if ($actionicons) {
                 $cell6 = new html_table_cell($OUTPUT->action_icon($urledit, new pix_icon('t/edit', get_string('edit'),
-                        '', array('class' => 'iconsmall'))) . $OUTPUT->action_icon($urldelet, new pix_icon('t/delete',
-                        get_string('delete'), '', array('class' => 'iconsmall'))));
+                        '', array('class' => 'icon-small'))) . $OUTPUT->action_icon($urldelet, new pix_icon('t/delete',
+                        get_string('delete'), '', array('class' => 'icon-small'))));
                 $row3 = new html_table_row();
                 $row3->cells[] = $cell5;
                 $row3->cells[] = $cell6;

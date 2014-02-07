@@ -249,7 +249,7 @@ function question_type_icon_html($action, $qtypename, $icon, $alt, $tip) {
     global $OUTPUT;
     return $OUTPUT->action_icon(new moodle_url('/admin/qtypes.php',
             array($action => $qtypename, 'sesskey' => sesskey())),
-            new pix_icon($icon, $alt, 'moodle', array('title' => '', 'class' => 'iconsmall')),
+            new pix_icon($icon, $alt, 'moodle', array('title' => '', 'class' => 'icon-small')),
             null, array('title' => $tip));
 }
 

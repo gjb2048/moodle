@@ -508,7 +508,7 @@ class pix_icon implements renderable {
 
         $this->attributes['alt'] = $alt;
         if (empty($this->attributes['class'])) {
-            $this->attributes['class'] = 'smallicon';
+            $this->attributes['class'] = 'icon-small';
         }
         if (!isset($this->attributes['title'])) {
             $this->attributes['title'] = $this->attributes['alt'];
@@ -3249,7 +3249,7 @@ class action_menu implements renderable {
                 't/edit_menu',
                 '',
                 'moodle',
-                array('class' => 'iconsmall actionmenu', 'title' => '')
+                array('class' => 'icon-small actionmenu', 'title' => '')
             );
             $pixicon = $this->actionicon;
         }

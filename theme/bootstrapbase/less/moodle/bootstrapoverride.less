@@ -30,3 +30,11 @@ h4 small { font-size: round(@baseFontSize * 0.85); } // ~12px
     width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
     *width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) - (.5 / @gridRowWidth * 100 * 1%);
 }
+
+// Sprites.less - override to ensure all icon-small's are 12px as per http://docs.moodle.org/dev/Moodle_icons.
+[class^="icon-"],
+[class*=" icon-"] {
+  .icon-small;
+  line-height: 12px;
+  background-position: 12px 12px;
+}

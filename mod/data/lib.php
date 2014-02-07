@@ -1214,9 +1214,9 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         $patterns[]='##delete##';
         if ($canmanageentries || (!$readonly && data_isowner($record->id))) {
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/edit.php?d='
-                             .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'"><img src="'.$OUTPUT->pix_url('t/edit') . '" class="iconsmall" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
+                             .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'"><img src="'.$OUTPUT->pix_url('t/edit') . '" class="icon-small" alt="'.get_string('edit').'" title="'.get_string('edit').'" /></a>';
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/view.php?d='
-                             .$data->id.'&amp;delete='.$record->id.'&amp;sesskey='.sesskey().'"><img src="'.$OUTPUT->pix_url('t/delete') . '" class="iconsmall" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
+                             .$data->id.'&amp;delete='.$record->id.'&amp;sesskey='.sesskey().'"><img src="'.$OUTPUT->pix_url('t/delete') . '" class="icon-small" alt="'.get_string('delete').'" title="'.get_string('delete').'" /></a>';
         } else {
             $replacement[] = '';
             $replacement[] = '';
@@ -1228,7 +1228,7 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         }
         $patterns[]='##more##';
         $replacement[] = '<a href="'.$moreurl.'"><img src="'.$OUTPUT->pix_url('t/preview').
-                        '" class="iconsmall" alt="'.get_string('more', 'data').'" title="'.get_string('more', 'data').
+                        '" class="icon-small" alt="'.get_string('more', 'data').'" title="'.get_string('more', 'data').
                         '" /></a>';
 
         $patterns[]='##moreurl##';
@@ -1270,7 +1270,7 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         if (has_capability('mod/data:approve', $context) && ($data->approval) && (!$record->approved)) {
             $approveurl = new moodle_url('/mod/data/view.php',
                     array('d' => $data->id, 'approve' => $record->id, 'sesskey' => sesskey()));
-            $approveicon = new pix_icon('t/approve', get_string('approve', 'data'), '', array('class' => 'iconsmall'));
+            $approveicon = new pix_icon('t/approve', get_string('approve', 'data'), '', array('class' => 'icon-small'));
             $replacement[] = html_writer::tag('span', $OUTPUT->action_icon($approveurl, $approveicon),
                     array('class' => 'approve'));
         } else {
@@ -1281,7 +1281,7 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         if (has_capability('mod/data:approve', $context) && ($data->approval) && ($record->approved)) {
             $disapproveurl = new moodle_url('/mod/data/view.php',
                     array('d' => $data->id, 'disapprove' => $record->id, 'sesskey' => sesskey()));
-            $disapproveicon = new pix_icon('t/block', get_string('disapprove', 'data'), '', array('class' => 'iconsmall'));
+            $disapproveicon = new pix_icon('t/block', get_string('disapprove', 'data'), '', array('class' => 'icon-small'));
             $replacement[] = html_writer::tag('span', $OUTPUT->action_icon($disapproveurl, $disapproveicon),
                     array('class' => 'disapprove'));
         } else {

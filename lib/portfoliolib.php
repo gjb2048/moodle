@@ -356,7 +356,7 @@ class portfolio_add_button {
             break;
             case PORTFOLIO_ADD_ICON_LINK:
                 $linkoutput = $OUTPUT->action_icon($url, new pix_icon('t/portfolioadd', $addstr, '',
-                    array('class' => 'portfolio-add-icon smallicon')));
+                    array('class' => 'portfolio-add-icon icon-small')));
             break;
             case PORTFOLIO_ADD_TEXT_LINK:
                 $linkoutput = html_writer::link($url, $addstr, array('class' => 'portfolio-add-link',

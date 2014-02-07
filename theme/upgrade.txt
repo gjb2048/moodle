@@ -1,6 +1,10 @@
 This files describes API changes in /theme/* themes,
 information provided here is intended especially for theme designer.
 
+=== 2.7 ===
+Selector changes:
+* Renamed all '.iconsmall' and '.smallicon' classes to '.icon-small' - MDL-43112.
+
 === 2.6 ===
 
 Removed themes:

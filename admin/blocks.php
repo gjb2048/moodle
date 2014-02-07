@@ -179,10 +179,10 @@
             $visible = '';
         } else if ($blocks[$blockid]->visible) {
             $visible = '<a href="blocks.php?hide='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strhide.'">'.
-                       '<img src="'.$OUTPUT->pix_url('t/hide') . '" class="iconsmall" alt="'.$strhide.'" /></a>';
+                       '<img src="'.$OUTPUT->pix_url('t/hide') . '" class="icon-small" alt="'.$strhide.'" /></a>';
         } else {
             $visible = '<a href="blocks.php?show='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strshow.'">'.
-                       '<img src="'.$OUTPUT->pix_url('t/show') . '" class="iconsmall" alt="'.$strshow.'" /></a>';
+                       '<img src="'.$OUTPUT->pix_url('t/show') . '" class="icon-small" alt="'.$strshow.'" /></a>';
             $class = 'dimmed_text';
         }
 
@@ -197,10 +197,10 @@
             $undeletable = '';
         } else if (in_array($blockname, $undeletableblocktypes)) {
             $undeletable = '<a href="blocks.php?unprotect='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strunprotect.'">'.
-                       '<img src="'.$OUTPUT->pix_url('t/unlock') . '" class="iconsmall" alt="'.$strunprotect.'" /></a>';
+                       '<img src="'.$OUTPUT->pix_url('t/unlock') . '" class="icon-small" alt="'.$strunprotect.'" /></a>';
         } else {
             $undeletable = '<a href="blocks.php?protect='.$blockid.'&amp;sesskey='.sesskey().'" title="'.$strprotect.'">'.
-                       '<img src="'.$OUTPUT->pix_url('t/lock') . '" class="iconsmall" alt="'.$strprotect.'" /></a>';
+                       '<img src="'.$OUTPUT->pix_url('t/lock') . '" class="icon-small" alt="'.$strprotect.'" /></a>';
         }
 
         $row = array(
