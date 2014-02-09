@@ -572,6 +572,11 @@ class assign {
             $update->sendstudentnotifications = $formdata->sendstudentnotifications;
         }
         $update->duedate = $formdata->duedate;
+        if (empty($formdata->displayduedate)) {
+            $update->displayduedate = 0;
+        } else {
+            $update->displayduedate = $formdata->displayduedate;
+        }
         $update->cutoffdate = $formdata->cutoffdate;
         $update->allowsubmissionsfromdate = $formdata->allowsubmissionsfromdate;
         $update->grade = $formdata->grade;
@@ -913,6 +918,11 @@ class assign {
             $update->sendstudentnotifications = $formdata->sendstudentnotifications;
         }
         $update->duedate = $formdata->duedate;
+        if (empty($formdata->displayduedate)) {
+            $update->displayduedate = 0;
+        } else {
+            $update->displayduedate = $formdata->displayduedate;
+        }
         $update->cutoffdate = $formdata->cutoffdate;
         $update->allowsubmissionsfromdate = $formdata->allowsubmissionsfromdate;
         $update->grade = $formdata->grade;
