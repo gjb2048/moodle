@@ -441,7 +441,7 @@
   .empty-region-side-post.used-region-side-pre {
       #block-region-side-pre.span4,
       #region-main.span8.span8 {
-        .fluid-span(12);
+        .fluid-span(12, @fluidGridColumnWidth, @fluidGridGutterWidth);
       }
   }
 
@@ -486,19 +486,18 @@
 
         #category-listing,
         #course-listing {
-            .fluid-span(6);
-            margin-left: @fluidGridGutterWidth;
-            *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
+            .fluid-span(6, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+            margin-left: @fluidGridGutterWidth1200;
+            *margin-left: @fluidGridGutterWidth1200 - (.5 / @gridRowWidth * 100 * 1%);
             &:first-child {
                 margin-left: 0;
             }
         }
         #course-detail {
-            .fluid-span(12);
+            .fluid-span(12, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
             margin: 1em 0 0;
         }
     }
-
 }
 
 // All widths up to 1199px.
@@ -510,7 +509,7 @@
         #category-listing,
         #course-listing,
         #course-detail {
-            .fluid-span(12);
+            .fluid-span(12, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
             margin: 0 0 1em 0;
         }
     }
@@ -533,7 +532,7 @@
         }
     }
 
-   #page-mod-forum-discuss.dir-rtl .discussioncontrols {
-       text-align: left;
-   }
+    #page-mod-forum-discuss.dir-rtl .discussioncontrols {
+        text-align: left;
+    }
 }
