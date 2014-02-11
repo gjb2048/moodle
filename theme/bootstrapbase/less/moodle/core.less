@@ -35,11 +35,39 @@
 .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
     #region-main.span8 {
         /** Increase the span size by 1 **/
-        .fluid-span(9);
+        .fluid-span(9, @fluidGridColumnWidth, @fluidGridGutterWidth);
     }
     #block-region-side-pre.span4 {
         /** Decrease the span size by 1 **/
-        .fluid-span(3);
+        .fluid-span(3, @fluidGridColumnWidth, @fluidGridGutterWidth);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 979px) {
+    .empty-region-side-post.used-region-side-pre, // Post region is empty and pre region is in use.
+    .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+        }
+    }
+}
+
+@media (min-width: 1200px) {
+    .empty-region-side-post.used-region-side-pre, // Post region is empty and pre region is in use.
+    .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+        }
     }
 }
 
