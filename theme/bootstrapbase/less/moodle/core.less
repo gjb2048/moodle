@@ -29,13 +29,38 @@
     width:100%;
 }
 
+// grid.less implied.
 .empty-region-side-post.used-region-side-pre #region-main.span8 {
     /** increase the span size by 1 **/
-    .fluid-span(9);
+    .fluid-span(9, @fluidGridColumnWidth, @fluidGridGutterWidth);
 }
 .empty-region-side-post.used-region-side-pre #block-region-side-pre.span4 {
     /** decrease the span size by 1 **/
-    .fluid-span(3);
+    .fluid-span(3, @fluidGridColumnWidth, @fluidGridGutterWidth);
+}
+
+// responsive-768px-979px.less.
+@media (min-width: 768px) and (max-width: 979px) {
+    .empty-region-side-post.used-region-side-pre #region-main.span8 {
+        /** increase the span size by 1 **/
+        .fluid-span(9, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+    .empty-region-side-post.used-region-side-pre #block-region-side-pre.span4 {
+        /** decrease the span size by 1 **/
+        .fluid-span(3, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+}
+
+// responsive-1200px-min.less.
+@media (min-width: 1200px) {
+    .empty-region-side-post.used-region-side-pre #region-main.span8 {
+        /** increase the span size by 1 **/
+        .fluid-span(9, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
+    .empty-region-side-post.used-region-side-pre #block-region-side-pre.span4 {
+        /** decrease the span size by 1 **/
+        .fluid-span(3, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
 }
 
 .empty-region-side-pre #region-bs-main-and-post.span9 #region-main.span8 {
