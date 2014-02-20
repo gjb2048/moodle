@@ -377,7 +377,7 @@
 
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 // Resize, reflow file-picker on small devices
    #filesskin .yui3-panel,
    #filesskin .file-picker.fp-generallayout {
@@ -463,4 +463,33 @@
    #page-mod-forum-discuss.dir-rtl .discussioncontrols {
        text-align: left;
    }
+}
+
+// Core empty block regions.
+@media (min-width: 768px) and (max-width: 979px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+    .empty-region-side-post.used-region-side-pre #region-main.span8 {
+        /** increase the span size by 1 **/
+        .fluid-span(9);
+    }
+    .empty-region-side-post.used-region-side-pre #block-region-side-pre.span4 {
+        /** decrease the span size by 1 **/
+        .fluid-span(3);
+    }
+}
+
+@media (min-width: 1200px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
+    .empty-region-side-post.used-region-side-pre #region-main.span8 {
+        /** increase the span size by 1 **/
+        .fluid-span(9);
+    }
+    .empty-region-side-post.used-region-side-pre #block-region-side-pre.span4 {
+        /** decrease the span size by 1 **/
+        .fluid-span(3);
+    }
 }
