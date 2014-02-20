@@ -382,7 +382,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 // Resize, reflow file-picker on small devices
    #filesskin .yui3-panel,
    #filesskin .file-picker.fp-generallayout {
@@ -440,7 +440,7 @@
   // core.less which take precedence which break responsiveness.
   .empty-region-side-post.used-region-side-pre {
       #block-region-side-pre.span4,
-      #region-main.span8.span8 {
+      #region-main.span8 {
         .fluid-span(12);
       }
   }
@@ -479,6 +479,9 @@
 
 // All widths between 1200px and 1600px
 @media (min-width: 1200px) and (max-width: 1600px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
     // CSS for the course management pages.
     #course-category-listings.columns-3 {
         background-color:transparent;
@@ -487,8 +490,8 @@
         #category-listing,
         #course-listing {
             .fluid-span(6);
-            margin-left: @fluidGridGutterWidth;
-            *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
+            margin-left: @fluidGridGutterWidth1200;
+            *margin-left: @fluidGridGutterWidth1200 - (.5 / @gridRowWidth * 100 * 1%);
             &:first-child {
                 margin-left: 0;
             }
@@ -498,11 +501,13 @@
             margin: 1em 0 0;
         }
     }
-
 }
 
 // All widths up to 1199px.
 @media (max-width: 1199px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
     // CSS for the course management pages.
     #course-category-listings.columns-3 {
         background-color:transparent;
@@ -536,4 +541,39 @@
    #page-mod-forum-discuss.dir-rtl .discussioncontrols {
        text-align: left;
    }
+}
+
+// Core empty block regions.
+@media (min-width: 768px) and (max-width: 979px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+    .empty-region-side-post.used-region-side-pre, // Post region is empty and pre region is in use.
+    .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
+    }
+}
+
+@media (min-width: 1200px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
+    .empty-region-side-post.used-region-side-pre, // Post region is empty and pre region is in use.
+    .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
+    }
 }
