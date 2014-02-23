@@ -1,7 +1,6 @@
 /* responsive.less */
 
-// Should probably be moved to relevant .less files
-// after 4095 selector issue is solved
+// Should probably be moved to relevant .less files after 4095 selector issue is solved.
 
 @media (min-width: 980px) {
     .dir-rtl .navbar .nav.pull-right,
@@ -13,6 +12,15 @@
         & > li {
             float: right;
         }
+    }
+
+    .loginbox.twocolumns .loginpanel {
+        margin-left: 0;
+    }
+    .loginbox.twocolumns .loginpanel,
+    .loginbox.twocolumns .signuppanel {
+        width: 48.617948717948715%;
+        *width: 48.664757228587014%;
     }
 }
 
@@ -101,16 +109,16 @@
 
 }
 
-// login page
 @media (min-width: 1200px) {
+    // Login page.
     .loginbox.twocolumns .loginpanel {
         margin-left: 0;
     }
     .loginbox.twocolumns .loginpanel,
     .loginbox.twocolumns .signuppanel {
         width: 48.717948717948715%;
-       *width: 48.664757228587014%;
-   }
+        *width: 48.664757228587014%;
+    }
     // Wider form labels.
     .form-item .form-label,
     .mform .fitem div.fitemtitle,
@@ -158,17 +166,41 @@
         }
     }
 
-}
-
-@media (min-width: 980px) {
-    .loginbox.twocolumns .loginpanel {
-        margin-left: 0;
+    // Core empty block regions.
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
     }
-    .loginbox.twocolumns .loginpanel,
-    .loginbox.twocolumns .signuppanel {
-        width: 48.617948717948715%;
-       *width: 48.664757228587014%;
-   }
+    .empty-region-side-post.used-region-side-pre, // Post region is empty and pre region is in use.
+    .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
+    }
+
+    // CSS for the course management pages.
+    #course-category-listings.columns-3 {
+        background-color:transparent;
+        border:0;
+
+        #category-listing,
+        #course-listing {
+            .fluid-span(6);
+            margin-left: @fluidGridGutterWidth1200;
+            *margin-left: @fluidGridGutterWidth1200 - (.5 / @gridRowWidth * 100 * 1%);
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+        #course-detail {
+            .fluid-span(12);
+            margin: 1em 0 0;
+        }
+    }
 }
 
 @media (min-width: 768px) and (max-width: 979px) {
@@ -180,27 +212,38 @@
         width: 48.61878453038674%;
         *width: 48.56559304102504%;
     }
+
+    // Core empty block regions.
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+    .empty-region-side-post.used-region-side-pre, // Post region is empty and pre region is in use.
+    .jsenabled.docked-region-side-post.used-region-side-pre { // All post blocks docked and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
+    }
+
+    // Shrink calender when short on space in block
+    .block_calendar_month .content,
+    .block .minicalendar td {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
-@media (max-width: 767px) {
-     .loginbox.twocolumns .loginpanel,
-     .loginbox.twocolumns .signuppanel {
-         display: block;
-         float: none;
-         width: 100%;
-         margin-left: 0;
-         .box-sizing(border-box);
-     }
- }
-
 @media (max-width: 480px) {
-    // make tabs act like nav-stacked
-    // (mostly) copied from bootstrap/navs.less
+    // Make tabs act like nav-stacked (mostly) copied from bootstrap/navs.less.
     .nav-tabs > li {
         float: none;
     }
     .nav-tabs > li > a {
-        margin-right: 0; // no need for the gap between nav items
+        margin-right: 0; // No need for the gap between nav items.
     }
     .nav-tabs {
         border-bottom: 0;
@@ -274,7 +317,7 @@
     }
 }
 
-// Stuart's 2,1,3 layout
+// Stuart's 2,1,3 layout.
 @media (min-width : 768px) {
   .row-fluid .desktop-first-column {
       margin-left: 0;
@@ -283,14 +326,23 @@
       display: inline;
   }
 }
+
 @media (max-width : 767px) {
-  .row-fluid .desktop-first-column {
-      clear: right;
-  }
-}
-// Forms
-@media (max-width: 767px) {
-  // Remove the horizontal form styles
+    .row-fluid .desktop-first-column {
+        clear: right;
+    }
+
+    .loginbox.twocolumns .loginpanel,
+    .loginbox.twocolumns .signuppanel {
+        display: block;
+        float: none;
+        width: 100%;
+        margin-left: 0;
+       .box-sizing(border-box);
+    }
+
+    // Forms.
+    // Remove the horizontal form styles.
     .form-item .form-label,
     .mform .fitem div.fitemtitle {
     // copied from .control-label {
@@ -329,14 +381,6 @@
     #helppopupbox {
         width: auto !important;
         left: 0 !important;
-    }
-}
-// Shrink calender when short on space in block
-@media (min-width : 768px) and (max-width: 979px) {
-    .block_calendar_month .content,
-    .block .minicalendar td {
-        padding-left: 0;
-        padding-right: 0;
     }
 }
 
@@ -383,14 +427,14 @@
 }
 
 @media (max-width: 768px) {
-// Resize, reflow file-picker on small devices
-   #filesskin .yui3-panel,
-   #filesskin .file-picker.fp-generallayout {
+    // Resize, reflow file-picker on small devices.
+    #filesskin .yui3-panel,
+    #filesskin .file-picker.fp-generallayout {
         width: 100%;
         left: 0;
     }
     .userprofile dl.list {
-    // copied from dl-horizontal in bootstrap/repsonsive.less
+    // Copied from dl-horizontal in bootstrap/repsonsive.less.
         dt {
           float: none;
           clear: none;
@@ -401,60 +445,60 @@
           margin-left: 0;
         }
     }
-    // Reset the alignment for required label to display inline on mobile devices
+    // Reset the alignment for required label to display inline on mobile devices.
     #page-mod-wiki-create .mform .fitem div.fitemtitle {
         float: left;
     }
 
-  // GRID & CONTAINERS
-  // -----------------
-  // Remove width from containers
-  .container {
-    width: auto;
-  }
-  // Fluid rows
-  .row-fluid {
-    width: 100%;
-  }
-  .row-fluid .span8.pull-right,
-  .row-fluid .span9.pull-right {
-    float: none;
-  }
-  // Undo negative margin on rows and thumbnails
-  .row {
-    margin-left: 0;
-  }
-  // Make all grid-sized elements block level again
-  [class*="span"],
-  .row-fluid [class*="span"] {
-    float: none;
-    display: block;
-    width: 100%;
-    margin-left: 0;
-    .box-sizing(border-box);
-  }
+    // GRID & CONTAINERS
+    // -----------------
+    // Remove width from containers.
+    .container {
+        width: auto;
+    }
+    // Fluid rows
+    .row-fluid {
+        width: 100%;
+    }
+    .row-fluid .span8.pull-right,
+    .row-fluid .span9.pull-right {
+        float: none;
+    }
+    // Undo negative margin on rows and thumbnails.
+    .row {
+        margin-left: 0;
+    }
+    // Make all grid-sized elements block level again.
+    [class*="span"],
+    .row-fluid [class*="span"] {
+        float: none;
+        display: block;
+        width: 100%;
+        margin-left: 0;
+        .box-sizing(border-box);
+    }
 
-  // We need to specify a more specific selector to reset the width for
-  // cases when we have content in the side-pre blockregion but not in the
-  // side-post blockregion as there are more specific selectors in
-  // core.less which take precedence which break responsiveness.
-  .empty-region-side-post.used-region-side-pre {
-      #block-region-side-pre.span4,
-      #region-main.span8.span8 {
-        .fluid-span(12);
-      }
-  }
+    // We need to specify a more specific selector to reset the width for
+    // cases when we have content in the side-pre blockregion but not in the
+    // side-post blockregion as there are more specific selectors in
+    // core.less which take precedence which break responsiveness.
+    .empty-region-side-post.used-region-side-pre {
+        #block-region-side-pre.span4,
+        #region-main.span8 {
+            .fluid-span(12);
+        }
+    }
 
-  .row-fluid .span12 {
-    width: 100%;
-    .box-sizing(border-box);
-  }
-  .row-fluid [class*="offset"]:first-child {
-    margin-left: 0;
-  }
-  div[role=main] {
-      margin-bottom: 1em;
-  }
+    .row-fluid .span12 {
+        width: 100%;
+        .box-sizing(border-box);
+    }
+    .row-fluid [class*="offset"]:first-child {
+        margin-left: 0;
+    }
+    div[role=main] {
+        margin-bottom: 1em;
+    }
     .coursebox {
         .info {
             .name {
@@ -477,32 +521,11 @@
     }
 }
 
-// All widths between 1200px and 1600px
-@media (min-width: 1200px) and (max-width: 1600px) {
-    // CSS for the course management pages.
-    #course-category-listings.columns-3 {
-        background-color:transparent;
-        border:0;
-
-        #category-listing,
-        #course-listing {
-            .fluid-span(6);
-            margin-left: @fluidGridGutterWidth;
-            *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
-            &:first-child {
-                margin-left: 0;
-            }
-        }
-        #course-detail {
-            .fluid-span(12);
-            margin: 1em 0 0;
-        }
-    }
-
-}
-
 // All widths up to 1199px.
 @media (max-width: 1199px) {
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
     // CSS for the course management pages.
     #course-category-listings.columns-3 {
         background-color:transparent;
