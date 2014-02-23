@@ -120,6 +120,20 @@
         }
     }
 
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
+    // Core empty block regions.
+    .empty-region-side-post.used-region-side-pre { // Post region is empty and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
+    }
 }
 
 @media (min-width: 980px) {
@@ -141,6 +155,21 @@
     .loginbox.twocolumns .signuppanel {
         width: 48.61878453038674%;
         *width: 48.56559304102504%;
+    }
+
+    // Core empty block regions.
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+    .empty-region-side-post.used-region-side-pre { // Post region is empty and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
     }
 }
 
@@ -374,10 +403,9 @@
     .nav-collapse.active {
         height: auto;
     }
-
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 // Resize, reflow file-picker on small devices
    #filesskin .yui3-panel,
    #filesskin .file-picker.fp-generallayout {
@@ -427,6 +455,16 @@
     width: 100%;
     margin-left: 0;
     .box-sizing(border-box);
+  }
+  // We need to specify a more specific selector to reset the width for
+  // cases when we have content in the side-pre blockregion but not in the
+  // side-post blockregion as there are more specific selectors in
+  // core.less which take precedence which break responsiveness.
+  .empty-region-side-post.used-region-side-pre {
+      #block-region-side-pre.span4,
+      #region-main.span8 {
+        .fluid-span(12);
+      }
   }
   .row-fluid .span12 {
     width: 100%;
