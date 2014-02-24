@@ -101,8 +101,8 @@
 
 }
 
-// login page
 @media (min-width: 1200px) {
+    // Login page.
     .loginbox.twocolumns .loginpanel {
         margin-left: 0;
     }
@@ -158,6 +158,40 @@
         }
     }
 
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth1200, @fluidGridGutterWidth1200);
+    }
+    // CSS for the course management pages.
+    #course-category-listings.columns-3 {
+        background-color:transparent;
+        border:0;
+
+        #category-listing,
+        #course-listing {
+            .fluid-span(6);
+            margin-left: @fluidGridGutterWidth1200;
+            *margin-left: @fluidGridGutterWidth1200 - (.5 / @gridRowWidth * 100 * 1%);
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+        #course-detail {
+            .fluid-span(12);
+            margin: 1em 0 0;
+        }
+    }
+
+    // Core empty block regions.
+    .empty-region-side-post.used-region-side-pre { // Post region is empty and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
+    }
 }
 
 @media (min-width: 980px) {
@@ -179,6 +213,21 @@
     .loginbox.twocolumns .signuppanel {
         width: 48.61878453038674%;
         *width: 48.56559304102504%;
+    }
+
+    // Core empty block regions.
+    .fluid-span (@columns) {
+        .fluid-span-full(@columns, @fluidGridColumnWidth768, @fluidGridGutterWidth768);
+    }
+    .empty-region-side-post.used-region-side-pre { // Post region is empty and pre region is in use.
+        #region-main.span8 {
+            /** increase the span size by 1 **/
+            .fluid-span(9);
+        }
+        #block-region-side-pre.span4 {
+            /** decrease the span size by 1 **/
+            .fluid-span(3);
+        }
     }
 }
 
@@ -382,7 +431,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 // Resize, reflow file-picker on small devices
    #filesskin .yui3-panel,
    #filesskin .file-picker.fp-generallayout {
@@ -440,7 +489,7 @@
   // core.less which take precedence which break responsiveness.
   .empty-region-side-post.used-region-side-pre {
       #block-region-side-pre.span4,
-      #region-main.span8.span8 {
+      #region-main.span8 {
         .fluid-span(12);
       }
   }
@@ -475,30 +524,6 @@
             }
         }
     }
-}
-
-// All widths between 1200px and 1600px
-@media (min-width: 1200px) and (max-width: 1600px) {
-    // CSS for the course management pages.
-    #course-category-listings.columns-3 {
-        background-color:transparent;
-        border:0;
-
-        #category-listing,
-        #course-listing {
-            .fluid-span(6);
-            margin-left: @fluidGridGutterWidth;
-            *margin-left: @fluidGridGutterWidth - (.5 / @gridRowWidth * 100 * 1%);
-            &:first-child {
-                margin-left: 0;
-            }
-        }
-        #course-detail {
-            .fluid-span(12);
-            margin: 1em 0 0;
-        }
-    }
-
 }
 
 // All widths up to 1199px.
