@@ -197,11 +197,33 @@ class grade_report_grader extends grade_report {
 
             foreach ($students as $userid => $items) {
                 $userid = clean_param($userid, PARAM_INT);
+                $changedwhilstediting = false;
                 foreach ($items as $itemid => $postedvalue) {
                     $itemid = clean_param($itemid, PARAM_INT);
 
                     // Was change requested?
                     $oldvalue = $this->grades[$userid][$itemid];
+
+                    if ($changedwhilstediting && $oldvalue->grade_item->is_course_item()) {
+                        // Course total posted value cannot be trusted because of another user changing an item so do not set.
+                        continue;
+                    }
+
+                    // Has the grade item changed whilst editing?
+                    if ($data->editstarttime < $oldvalue->timemodified) {
+                        $userfields = 'id, ' . get_all_user_name_fields(true);
+                        $user = $DB->get_record('user', array('id' => $userid), $userfields);
+                        $errorsavegradesfailedstr = new stdClass();
+                        $errorsavegradesfailedstr->username = fullname($user);
+                        $errorsavegradesfailedstr->itemname = $oldvalue->grade_item->itemname;
+
+                        $warnings[] = get_string('errorsavegradesfailed', 'gradereport_grader', $errorsavegradesfailedstr);
+
+                        $changedwhilstediting = true;
+
+                        continue;
+                    }
+
                     if ($datatype === 'grade') {
                         // If there was no grade and there still isn't
                         if (is_null($oldvalue->finalgrade) && $postedvalue == -1) {
@@ -323,7 +345,7 @@ class grade_report_grader extends grade_report {
         }
 
         if ($changedgrades) {
-            // If a final grade was overriden reload grades so dependent grades like course total will be correct
+            // If a final grade was overridden reload grades so dependent grades like course total will be correct.
             $this->grades = null;
         }
 

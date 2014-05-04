@@ -28,6 +28,9 @@ $string['ajaxerror'] = 'Error';
 $string['ajaxfailedupdate'] = 'Unable to update [1] for [2]';
 $string['ajaxfieldchanged'] = 'The field you are currently editing has changed, would you like to use the updated value?';
 $string['ajaxchoosescale'] = 'Choose';
+$string['errorsavegradesfailed'] =
+'User \'{$a->username}\' grade for \'{$a->itemname}\' has not been changed because it has been set by another user whilst you were editing
+ the grader report.  Any override to the course total will be lost.';
 $string['grader:manage'] = 'Manage the grader report';
 $string['grader:view'] = 'View the grader report';
 $string['pluginname'] = 'Grader report';
