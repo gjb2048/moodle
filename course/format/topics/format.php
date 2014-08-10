@@ -48,6 +48,13 @@ if (($marker >=0) && has_capability('moodle/course:setcurrentsection', $context)
 $course = course_get_format($course)->get_course();
 course_create_sections_if_missing($course, range(0, $course->numsections));
 
+// Test clean_param to see if it accepts '<' and '>' for PARAM_TEXT as stated in moodlelib.php.
+echo '<h3>clean_param(\'<\',PARAM_TEXT): '.clean_param('<',PARAM_TEXT).'</h3>';
+echo '<h3>clean_param(\'>\',PARAM_TEXT): '.clean_param('>',PARAM_TEXT).'</h3>';
+echo '<h3>clean_param(\'<\',PARAM_RAW) : '.clean_param('<',PARAM_RAW).'</h3>';
+echo '<h3>clean_param(\'>\',PARAM_RAW) : '.clean_param('>',PARAM_RAW).'</h3>';
+
+
 $renderer = $PAGE->get_renderer('format_topics');
 
 if (!empty($displaysection)) {
