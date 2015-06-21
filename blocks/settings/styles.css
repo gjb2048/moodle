@@ -20,9 +20,6 @@
 .jsenabled .block_settings .block_tree .collapsed ul {display: none;}
 .jsenabled .block_settings .block_tree .collapsed .tree_item.branch {background-image: url([[pix:t/collapsed]]);}
 
-/** Internet explorer specific rules **/
-.ie6 .block_settings .block_tree .tree_item {width:100%;}
-
 /** Overide for RTL layout **/
 .dir-rtl .block_settings .block_tree {padding-right:0px;}
 .dir-rtl .block_settings .block_tree li ul {padding-left:0;padding-right: 18px;}
