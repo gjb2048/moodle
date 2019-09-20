@@ -22,7 +22,7 @@
             if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $modcontext)) {
                 $streditsummary  = get_string('editsummary');
                 $introcontent .= '<div class="editinglink"><a title="'.$streditsummary.'" '.
-                                 '   href="modedit.php?update='.$cm->id.'&amp;sesskey='.sesskey().'">'.
+                                 '   href="'.$CFG->wwwroot.'/course/modedit.php?update='.$cm->id.'&amp;sesskey='.sesskey().'">'.
                                  $OUTPUT->pix_icon('t/edit', $streditsummary) . '</a></div>';
             }
             echo $OUTPUT->box($introcontent, 'generalbox', 'intro');
