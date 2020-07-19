@@ -148,3 +148,21 @@ function theme_classic_pluginfile($course, $cm, $context, $filearea, $args, $for
         send_file_not_found();
     }
 }
+
+/**
+ * Extend the course navigation.
+ *
+ * @param navigation_node $coursenode The navigation node.
+ * @param stdClass $course The course.
+ * @param context_course $coursecontext The course context.
+ */
+function theme_classic_extend_navigation_course($coursenode, $course, $coursecontext) {
+    global $PAGE;
+
+    if ($PAGE->theme->name == 'classic') {
+        $turneditingonoff = $coursenode->find('turneditingonoff', navigation_node::TYPE_SETTING);
+        if (!empty($turneditingonoff)) {
+            $turneditingonoff->remove();
+        }
+    }
+}
