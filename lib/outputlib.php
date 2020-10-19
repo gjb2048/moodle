@@ -687,21 +687,13 @@ class theme_config {
     public static function load($themename) {
         global $CFG;
 
-        // load theme settings from db
-        try {
-            $settings = get_config('theme_'.$themename);
-        } catch (dml_exception $e) {
-            // most probably moodle tables not created yet
-            $settings = new stdClass();
-        }
-
-        if ($config = theme_config::find_theme_config($themename, $settings)) {
+        if ($config = theme_config::find_theme_config($themename)) {
             return new theme_config($config);
 
         } else if ($themename == theme_config::DEFAULT_THEME) {
             throw new coding_exception('Default theme '.theme_config::DEFAULT_THEME.' not available or broken!');
 
-        } else if ($config = theme_config::find_theme_config($CFG->theme, $settings)) {
+        } else if ($config = theme_config::find_theme_config($CFG->theme)) {
             debugging('This page should be using theme ' . $themename .
                     ' which cannot be initialised. Falling back to the site theme ' . $CFG->theme, DEBUG_NORMAL);
             return new theme_config($config);
@@ -711,7 +703,7 @@ class theme_config {
             debugging('This page should be using theme ' . $themename .
                     ' which cannot be initialised. Nor can the site theme ' . $CFG->theme .
                     '. Falling back to ' . theme_config::DEFAULT_THEME, DEBUG_NORMAL);
-            return new theme_config(theme_config::find_theme_config(theme_config::DEFAULT_THEME, $settings));
+            return new theme_config(theme_config::find_theme_config(theme_config::DEFAULT_THEME));
         }
     }
 
@@ -742,7 +734,7 @@ class theme_config {
         $this->dir      = $config->dir;
 
         if ($this->name != self::DEFAULT_THEME) {
-            $baseconfig = self::find_theme_config(self::DEFAULT_THEME, $this->settings);
+            $baseconfig = self::find_theme_config(self::DEFAULT_THEME);
         } else {
             $baseconfig = $config;
         }
@@ -762,9 +754,9 @@ class theme_config {
             }
         }
 
-        // verify all parents and load configs and renderers
+        // Verify all parents and load configs and renderers.
         foreach ($this->parents as $parent) {
-            if (!$parent_config = theme_config::find_theme_config($parent, $this->settings)) {
+            if (!$parent_config = theme_config::find_theme_config($parent)) {
                 // this is not good - better exclude faulty parents
                 continue;
             }
@@ -778,7 +770,18 @@ class theme_config {
                 // may contain core and plugin renderers and renderer factory
                 include_once($renderersfile);
             }
-            $this->parent_configs[$parent] = $parent_config;
+
+            // Override with our value.
+            foreach ($this->settings as $settingname => $setting) {
+                if ($settingname == 'version') {
+                    continue;
+                }
+                if (!empty($parent_config->settings->$settingname)) {
+                    $parent_config->settings->$settingname = $setting;
+                }
+            }
+
+            $this->parent_configs[$parent] = new theme_config($parent_config);
         }
         $libfile = $this->dir.'/lib.php';
         if (is_readable($libfile)) {
@@ -1554,19 +1557,25 @@ class theme_config {
         $content = '';
 
         // Getting all the candidate functions.
-        $candidates = array();
         foreach ($this->parent_configs as $parent_config) {
             if (!isset($parent_config->extrascsscallback)) {
                 continue;
             }
-            $candidates[] = $parent_config->extrascsscallback;
+            $candidates[] = array(
+                'config' => $parent_config,
+                'callback' => $parent_config->extrascsscallback
+            );
         }
-        $candidates[] = $this->extrascsscallback;
+        $candidates[] = array(
+            'config' => $this,
+            'callback' => $this->extrascsscallback
+        );
 
         // Calling the functions.
-        foreach ($candidates as $function) {
+        foreach ($candidates as $candidate) {
+            $function = $candidate['callback'];
             if (function_exists($function)) {
-                $content .= "\n/** Extra SCSS from $function **/\n" . $function($this) . "\n";
+                $content .= "\n/** Extra SCSS from $function **/\n" . $function($candidate['config']) . "\n";
             }
         }
 
@@ -1589,14 +1598,21 @@ class theme_config {
             if (!isset($parent_config->prescsscallback)) {
                 continue;
             }
-            $candidates[] = $parent_config->prescsscallback;
+            $candidates[] = array(
+                'config' => $parent_config,
+                'callback' => $parent_config->prescsscallback
+            );
         }
-        $candidates[] = $this->prescsscallback;
+        $candidates[] = array(
+            'config' => $this,
+            'callback' => $this->prescsscallback
+        );
 
         // Calling the functions.
-        foreach ($candidates as $function) {
+        foreach ($candidates as $candidate) {
+            $function = $candidate['callback'];
             if (function_exists($function)) {
-                $content .= "\n/** Pre-SCSS from $function **/\n" . $function($this) . "\n";
+                $content .= "\n/** Pre-SCSS from $function **/\n" . $function($candidate['config']) . "\n";
             }
         }
 
@@ -2276,11 +2292,10 @@ class theme_config {
      * Loads the theme config from config.php file.
      *
      * @param string $themename
-     * @param stdClass $settings from config_plugins table
      * @param boolean $parentscheck true to also check the parents.    .
      * @return stdClass The theme configuration
      */
-    private static function find_theme_config($themename, $settings, $parentscheck = true) {
+    private static function find_theme_config($themename, $parentscheck = true) {
         // We have to use the variable name $THEME (upper case) because that
         // is what is used in theme config.php files.
 
@@ -2291,7 +2306,14 @@ class theme_config {
         $THEME = new stdClass();
         $THEME->name     = $themename;
         $THEME->dir      = $dir;
-        $THEME->settings = $settings;
+
+        // Load theme settings from db.
+        try {
+            $THEME->settings = get_config('theme_'.$themename);
+        } catch (dml_exception $e) {
+            // most probably moodle tables not created yet
+            $THEME->settings = new stdClass();
+        }
 
         global $CFG; // just in case somebody tries to use $CFG in theme config
         include("$THEME->dir/config.php");
@@ -2305,7 +2327,7 @@ class theme_config {
             if ($parentscheck) {
                 // Find all parent theme configs.
                 foreach ($THEME->parents as $parent) {
-                    $parentconfig = theme_config::find_theme_config($parent, $settings, false);
+                    $parentconfig = theme_config::find_theme_config($parent, false);
                     if (empty($parentconfig)) {
                         return null;
                     }
