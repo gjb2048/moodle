@@ -32,7 +32,7 @@ class block_site_main_menu extends block_list {
     }
 
     function get_content() {
-        global $USER, $CFG, $DB, $OUTPUT;
+        global $CFG, $OUTPUT, $SITE, $USER;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -49,12 +49,13 @@ class block_site_main_menu extends block_list {
 
         require_once($CFG->dirroot . '/course/lib.php');
 
-        $course = get_site();
-        $format = course_get_format($course);
+        $format = course_get_format($this->page->course);
         $courserenderer = $format->get_renderer($this->page);
 
-        $context = context_course::instance($course->id);
+        $context = context_course::instance($this->page->course->id);
         $isediting = $this->page->user_is_editing() && has_capability('moodle/course:manageactivities', $context);
+
+        $firstsectionno = ($SITE->id == $this->page->course->id) ? 1 : 0;
 
         // Output classes.
         $cmnameclass = $format->get_output_classname('content\\cm\\cmname');
@@ -62,9 +63,9 @@ class block_site_main_menu extends block_list {
 
         // Extra fast view mode.
         if (!$isediting) {
-            $modinfo = get_fast_modinfo($course);
-            if (!empty($modinfo->sections[0])) {
-                foreach($modinfo->sections[0] as $cmid) {
+            $modinfo = get_fast_modinfo($this->page->course);
+            if (!empty($modinfo->sections[$firstsectionno])) {
+                foreach ($modinfo->sections[$firstsectionno] as $cmid) {
                     $cm = $modinfo->cms[$cmid];
                     if (!$cm->uservisible || !$cm->is_visible_on_course_page()) {
                         continue;
@@ -119,10 +120,10 @@ class block_site_main_menu extends block_list {
         }
 
         // Slow & hacky editing mode.
-        $ismoving = ismoving($course->id);
-        course_create_sections_if_missing($course, 0);
-        $modinfo = get_fast_modinfo($course);
-        $section = $modinfo->get_section_info(0);
+        $ismoving = ismoving($this->page->course->id);
+        course_create_sections_if_missing($this->page->course, $firstsectionno);
+        $modinfo = get_fast_modinfo($this->page->course);
+        $section = $modinfo->get_section_info($firstsectionno);
 
         if ($ismoving) {
             $strmovefull = strip_tags(get_string('movefull', '', "'$USER->activitycopyname'"));
@@ -237,8 +238,8 @@ class block_site_main_menu extends block_list {
             $this->content->icons[] = '';
         }
 
-        $this->content->footer = $courserenderer->course_section_add_cm_control($course,
-                0, null, array('inblock' => true));
+        $this->content->footer = $courserenderer->course_section_add_cm_control($this->page->course,
+            $firstsectionno, null, array('inblock' => true));
 
         return $this->content;
     }
