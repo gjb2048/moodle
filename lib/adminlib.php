@@ -110,6 +110,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/ddllib.php');
 require_once($CFG->libdir.'/xmlize.php');
 require_once($CFG->libdir.'/messagelib.php');
+require_once($CFG->dirroot.'/h5p/locallib.php');
 
 // Add classes, traits, and interfaces which should be autoloaded.
 // The autoloader is configured late in setup.php, after ABORT_AFTER_CONFIG.
