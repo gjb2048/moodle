@@ -47,6 +47,6 @@ if (!empty($defaulth5plib)) {
     $description = get_string('h5pcustomcss_help', 'core_h5p');
     $default = '';
     $setting = new admin_setting_configtextarea($name, $title, $description, $default);
-    $setting->set_updatedcallback('theme_core_h5p_customcss_updated');
+    $setting->set_updatedcallback('core_h5p_customcss_updated');
     $settings->add($setting);
 }

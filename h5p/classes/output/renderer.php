@@ -117,8 +117,8 @@ class renderer extends plugin_renderer_base {
     public function custom_styles($update = false) {
         $record = [
             'contextid' => \context_system::instance()->id,
-            'component' => \core_h5p\file_storage::COMPONENT,
-            'filearea' => \core_h5p\file_storage::CSS_FILEAREA,
+            'component' => \core_h5p\file_storage_attributes::COMPONENT,
+            'filearea' => \core_h5p\file_storage_attributes::CSS_FILEAREA,
             'itemid' => 0,
             'filepath' => '/',
             'filename' => 'custom_h5p.css',
@@ -140,7 +140,7 @@ class renderer extends plugin_renderer_base {
         }
         if (!$cssfile) {
             $css = get_config('core_h5p', 'h5pcustomcss');
-            $css = format_text($cssfile, FORMAT_PLAIN);
+            $css = format_text($css, FORMAT_PLAIN);
             $cssfile = $fs->create_file_from_string($record, $css);
         }
 

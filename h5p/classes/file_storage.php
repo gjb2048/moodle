@@ -38,22 +38,7 @@ use Moodle\H5PFileStorage;
  * @copyright  2019 Victor Deniz <victor@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class file_storage implements H5PFileStorage {
-
-    /** The component for H5P. */
-    public const COMPONENT   = 'core_h5p';
-    /** The library file area. */
-    public const LIBRARY_FILEAREA = 'libraries';
-    /** The content file area */
-    public const CONTENT_FILEAREA = 'content';
-    /** The cached assest file area. */
-    public const CACHED_ASSETS_FILEAREA = 'cachedassets';
-    /** The export file area */
-    public const EXPORT_FILEAREA = 'export';
-    /** The export css file area */
-    public const CSS_FILEAREA = 'css';
-    /** The icon filename */
-    public const ICON_FILENAME = 'icon.svg';
+class file_storage extends file_storage_attributes implements H5PFileStorage {
 
     /**
      * @var \context $context Currently we use the system context everywhere.
