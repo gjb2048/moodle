@@ -39,19 +39,30 @@ class renderer extends plugin_renderer_base {
      * @param string $embedtype Possible values: div, iframe, external, editor
      */
     public function h5p_alter_styles(&$styles, array $libraries, string $embedtype) {
-        global $CFG, $DB;
+        //global $CFG, $DB;
 
-        $record = [
+        /*$record = [
             'contextid' => \context_system::instance()->id,
             'component' => \core_h5p\file_storage::COMPONENT,
             'filearea' => \core_h5p\file_storage::CSS_FILEAREA,
             'itemid' => 0,
             'filepath' => '/',
-            'filename' => $CFG->theme . '_h5p.css',
+            'filename' => 'custom_h5p.css',
         ];
         $fs = get_file_storage();
+
+        if (!$fs->file_exists(
+            $record['contextid'],
+            $record['component'],
+            $record['filearea'],
+            $record['itemid'],
+            $record['filepath'],
+            $record['filename'])) {
+                $this->custom_styles_updated();
+        }
+
         // Check if the CSS file for the current theme needs to be updated (because the SCSS settings have changed recently).
-        if ($cssfile = $fs->get_file(
+        /*if ($cssfile = $fs->get_file(
                 $record['contextid'],
                 $record['component'],
                 $record['filearea'],
@@ -76,30 +87,74 @@ class renderer extends plugin_renderer_base {
         // When 'Raw initial SCSS' and 'Raw SCSS' theme settings are empty, the file doesn't need to be created.
         if (empty($theme->settings->scsspre) && empty($theme->settings->scss)) {
             return;
-        }
+        }*/
 
         // If the CSS file doesn't exist, create it with the styles defined in 'Raw initial SCSS' and 'Raw SCSS' theme settings.
         // As these scss and scsspre settings might have dependencies on the theme, the whole CSS theme content will be used and
         // passed to the H5P player.
-        if (!$cssfile) {
+        /*if (!$cssfile) {
             $css = $theme->get_css_content();
             $cssfile = $fs->create_file_from_string($record, $css);
-        }
+        }*/
 
-        $cssurl = \moodle_url::make_pluginfile_url(
+        ['cssurl' => $cssurl, 'cssversion' => $cssversion] = $this->custom_styles();
+        /*$cssurl = \moodle_url::make_pluginfile_url(
             $record['contextid'],
             $record['component'],
             $record['filearea'],
             null,
             $record['filepath'],
             $record['filename']
-        );
+        );*/
 
         // Add the CSS file to the styles array, to load it from the H5P player.
         $styles[] = (object) [
             'path' => $cssurl->out(),
-            'version' => '?ver='.$cssfile->get_timemodified(),
+            'version' => '?ver='.$cssversion,
         ];
+    }
+
+    public function custom_styles($update = false) {
+        $record = [
+            'contextid' => \context_system::instance()->id,
+            'component' => \core_h5p\file_storage::COMPONENT,
+            'filearea' => \core_h5p\file_storage::CSS_FILEAREA,
+            'itemid' => 0,
+            'filepath' => '/',
+            'filename' => 'custom_h5p.css',
+        ];
+        $fs = get_file_storage();
+
+        if ($cssfile = $fs->get_file(
+            $record['contextid'],
+            $record['component'],
+            $record['filearea'],
+            $record['itemid'],
+            $record['filepath'],
+            $record['filename'])) {
+            if ($update) {
+                // The CSS file needs to be updated.  First, delete it to recreate it later with the current CSS.
+                $cssfile->delete();
+                $cssfile = false;
+            }
+        }
+        if (!$cssfile) {
+            $css = get_config('core_h5p', 'h5pcustomcss');
+            $css = format_text($cssfile, FORMAT_PLAIN);
+            $cssfile = $fs->create_file_from_string($record, $css);
+        }
+
+        if (!$update) {
+            $cssurl = \moodle_url::make_pluginfile_url(
+                $record['contextid'],
+                $record['component'],
+                $record['filearea'],
+                null,
+                $record['filepath'],
+                $record['filename']);
+
+            return ['cssurl' => $cssurl, 'cssversion' => md5($css)];
+        }
     }
 
     /**
