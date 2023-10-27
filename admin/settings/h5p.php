@@ -41,4 +41,19 @@ if (!empty($defaulth5plib)) {
 
     $settings->add(new admin_settings_h5plib_handler_select('h5plibraryhandler', new lang_string('h5plibraryhandler', 'core_h5p'),
         new lang_string('h5plibraryhandler_help', 'core_h5p'), $defaulth5plib));
+
+    $setting = new admin_setting_configtextarea(
+        'core_h5p/h5pcustomcss',
+        new lang_string('h5pcustomcss', 'core_h5p'),
+        new lang_string('h5pcustomcss_help', 'core_h5p'),
+        '',
+        PARAM_NOTAGS
+    );
+    $setting->set_updatedcallback(function () {
+        global $CFG;
+        // Enables use of file_storage constants.
+        require_once($CFG->dirroot.'/h5p/h5plib/v126/joubel/core/h5p-file-storage.interface.php');
+        \core_h5p\file_storage::generate_custom_styles();
+    });
+    $settings->add($setting);
 }

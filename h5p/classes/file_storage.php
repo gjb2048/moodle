@@ -879,4 +879,36 @@ class file_storage implements H5PFileStorage {
 
         $this->fs->create_file_from_pathname($record, $sourcefile);
     }
+
+    /**
+     * Generate H5P custom styles if any.
+     */
+    public static function generate_custom_styles() {
+        $record = [
+            'contextid' => \context_system::instance()->id,
+            'component' => self::COMPONENT,
+            'filearea' => self::CSS_FILEAREA,
+            'itemid' => 0,
+            'filepath' => '/',
+            'filename' => 'custom_h5p.css',
+        ];
+
+        $fs = get_file_storage();
+        if ($cssfile = $fs->get_file(
+            $record['contextid'],
+            $record['component'],
+            $record['filearea'],
+            $record['itemid'],
+            $record['filepath'],
+            $record['filename'])) {
+            // The CSS file needs to be updated, so delete and recreate it
+            // if there is CSS in the 'h5pcustomcss' setting.
+            $cssfile->delete();
+        }
+
+        $css = get_config('core_h5p', 'h5pcustomcss');
+        if (!empty($css)) {
+            $fs->create_file_from_string($record, $css);
+        }
+    }
 }
