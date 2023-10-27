@@ -848,4 +848,61 @@ class file_storage_test extends \advanced_testcase {
         $this->assertFalse($this->h5p_fs_fs->file_exists($this->h5p_fs_context->id, file_storage::COMPONENT,
             file_storage::CONTENT_FILEAREA, $h5pcontentid, $filepath, $filename));
     }
+
+    /**
+     * Test H5P custom styles generation.
+     *
+     * @covers ::generate_custom_styles
+     */
+    public function test_generate_custom_styles(): void {
+        \set_config('h5pcustomcss', '.debug { color: #fab; }', 'core_h5p');
+        $h5pfsrc = new \ReflectionClass(file_storage::class);
+        $customcssfilename = $h5pfsrc->getConstant('CUSTOM_CSS_FILENAME');
+
+        file_storage::generate_custom_styles();
+
+        $this->assertTrue($this->h5p_fs_fs->file_exists(
+            \context_system::instance()->id,
+            file_storage::COMPONENT,
+            file_storage::CSS_FILEAREA,
+            0,
+            '/',
+            $customcssfilename)
+        );
+
+        $cssfile = $this->h5p_fs_fs->get_file(
+            \context_system::instance()->id,
+            file_storage::COMPONENT,
+            file_storage::CSS_FILEAREA,
+            0,
+            '/',
+            $customcssfilename
+        );
+        $this->assertTrue($cssfile !== false);
+        $this->assertInstanceOf('stored_file', $cssfile);
+
+        $csscontents = $cssfile->get_content();
+        $this->assertEquals($csscontents, '.debug { color: #fab; }');
+    }
+
+    /**
+     * Test H5P custom styles retrieval.
+     *
+     * @covers ::generate_custom_styles
+     * @covers ::get_custom_styles
+     */
+    public function test_get_custom_styles(): void {
+        global $CFG;
+        $css = '.debug { color: #fab; }';
+        $cssurl = $CFG->wwwroot . '/pluginfile.php/1/core_h5p/css/custom_h5p.css';
+        \set_config('h5pcustomcss', $css, 'core_h5p');
+
+        file_storage::generate_custom_styles();
+
+        $style = file_storage::get_custom_styles();
+
+        $this->assertTrue(!empty($style));
+        $this->assertEquals($style['cssurl']->out(), $cssurl);
+        $this->assertEquals($style['cssversion'], md5($css));
+    }
 }
