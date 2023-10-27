@@ -300,6 +300,14 @@ function theme_set_designer_mod($state) {
     theme_reset_all_caches();
 }
 
+function theme_core_h5p_customcss_updated() {
+    global $PAGE;
+
+    $renderer = $PAGE->get_renderer('core_h5p');
+
+    return;
+}
+
 /**
  * This class represents the configuration variables of a Moodle theme.
  *

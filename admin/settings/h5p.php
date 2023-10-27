@@ -41,4 +41,12 @@ if (!empty($defaulth5plib)) {
 
     $settings->add(new admin_settings_h5plib_handler_select('h5plibraryhandler', new lang_string('h5plibraryhandler', 'core_h5p'),
         new lang_string('h5plibraryhandler_help', 'core_h5p'), $defaulth5plib));
+
+    $name = 'core_h5p/h5pcustomcss';
+    $title = get_string('h5pcustomcss', 'core_h5p');
+    $description = get_string('h5pcustomcss_help', 'core_h5p');
+    $default = '';
+    $setting = new admin_setting_configtextarea($name, $title, $description, $default);
+    $setting->set_updatedcallback('theme_core_h5p_customcss_updated');
+    $settings->add($setting);
 }
