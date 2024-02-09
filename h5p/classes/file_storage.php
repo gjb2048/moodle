@@ -880,6 +880,9 @@ class file_storage implements H5PFileStorage {
         $this->fs->create_file_from_pathname($record, $sourcefile);
     }
 
+    /**
+     * Generate H5P custom styles if any.
+     */
     public static function generate_custom_styles() {
         $css = get_config('core_h5p', 'h5pcustomcss');
         if (!empty($css)) {
