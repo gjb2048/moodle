@@ -23,7 +23,6 @@ use plugin_renderer_base;
  *
  * @package    core_h5p
  * @copyright  2020 Victor Deniz {victor@moodle.com}
- * @copyright  2023 G J Barnard {@link https://moodle.org/user/profile.php?id=442195}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends plugin_renderer_base {
@@ -40,12 +39,21 @@ class renderer extends plugin_renderer_base {
      * @param string $embedtype Possible values: div, iframe, external, editor
      */
     public function h5p_alter_styles(&$styles, array $libraries, string $embedtype) {
-        $customcss = $this->custom_styles();
-        if (!empty($customcss)) {
+        $css = get_config('core_h5p', 'h5pcustomcss');
+        if (!empty($css)) {
+            $cssurl = \moodle_url::make_pluginfile_url(
+                \context_system::instance()->id,
+                \core_h5p\file_storage::COMPONENT,
+                \core_h5p\file_storage::CSS_FILEAREA,
+                null,
+                '/',
+                'custom_h5p.css'
+            );
+
             // Add the CSS file to the styles array, to load it from the H5P player.
             $styles[] = (object) [
-                'path' => $customcss['cssurl']->out(),
-                'version' => '?ver='.$customcss['cssversion'],
+                'path' => $cssurl->out(),
+                'version' => '?ver='.md5($css),
             ];
         }
     }

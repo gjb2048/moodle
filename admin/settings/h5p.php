@@ -49,6 +49,8 @@ if (!empty($defaulth5plib)) {
         '',
         PARAM_NOTAGS
     );
-    $setting->set_updatedcallback('core_h5p_customcss_updated');
+    $setting->set_updatedcallback(function () {
+        \core_h5p\file_storage::generate_custom_styles();
+    });
     $settings->add($setting);
 }

@@ -38,7 +38,22 @@ use Moodle\H5PFileStorage;
  * @copyright  2019 Victor Deniz <victor@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class file_storage extends file_storage_constants implements H5PFileStorage {
+class file_storage implements H5PFileStorage {
+
+    /** The component for H5P. */
+    public const COMPONENT   = 'core_h5p';
+    /** The library file area. */
+    public const LIBRARY_FILEAREA = 'libraries';
+    /** The content file area */
+    public const CONTENT_FILEAREA = 'content';
+    /** The cached assest file area. */
+    public const CACHED_ASSETS_FILEAREA = 'cachedassets';
+    /** The export file area */
+    public const EXPORT_FILEAREA = 'export';
+    /** The export css file area */
+    public const CSS_FILEAREA = 'css';
+    /** The icon filename */
+    public const ICON_FILENAME = 'icon.svg';
 
     /**
      * @var \context $context Currently we use the system context everywhere.
@@ -863,5 +878,34 @@ class file_storage extends file_storage_constants implements H5PFileStorage {
         }
 
         $this->fs->create_file_from_pathname($record, $sourcefile);
+    }
+
+    public static function generate_custom_styles() {
+        $css = get_config('core_h5p', 'h5pcustomcss');
+        if (!empty($css)) {
+            $record = [
+                'contextid' => \context_system::instance()->id,
+                'component' => self::COMPONENT,
+                'filearea' => self::CSS_FILEAREA,
+                'itemid' => 0,
+                'filepath' => '/',
+                'filename' => 'custom_h5p.css',
+            ];
+
+            $fs = get_file_storage();
+            if ($cssfile = $fs->get_file(
+                $record['contextid'],
+                $record['component'],
+                $record['filearea'],
+                $record['itemid'],
+                $record['filepath'],
+                $record['filename'])) {
+                    // The CSS file needs to be updated, so delete and recreate it
+                    // if there is CSS in the 'h5pcustomcss' setting.
+                    $cssfile->delete();
+                    $cssfile = false;
+            }
+            $cssfile = $fs->create_file_from_string($record, $css);
+        }
     }
 }
