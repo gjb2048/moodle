@@ -51,7 +51,7 @@ if (!empty($defaulth5plib)) {
     );
     $setting->set_updatedcallback(function () {
         global $CFG;
-        // Enables use of file_storage contstants.
+        // Enables use of file_storage constants.
         require_once($CFG->dirroot.'/h5p/h5plib/v126/joubel/core/h5p-file-storage.interface.php');
         \core_h5p\file_storage::generate_custom_styles();
     });
